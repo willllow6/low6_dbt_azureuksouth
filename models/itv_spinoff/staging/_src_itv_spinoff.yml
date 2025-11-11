@@ -1,0 +1,75 @@
+version: 2
+
+sources:
+
+  - name: itv_spinoff
+    description: itv spinoff
+    database: low6_azureuksouth
+    schema: adfitvspinoff
+    tables:
+
+      - name: achievement
+        identifier: achievement
+
+      - name: achievement_category
+        identifier: achievement_category
+
+      - name: daily_streak
+        identifier: daily_streak
+
+      - name: friends_league
+        identifier: friends_league
+
+      - name: friends_league_membership
+        identifier: friends_league_membership
+
+      - name: game_user
+        identifier: game_user
+
+      - name: leaderboard
+        identifier: leaderboard
+
+      - name: leaderboard_daily
+        identifier: leaderboard_daily
+
+      - name: leaderboard_overall
+        identifier: leaderboard_overall
+
+      - name: leaderboard_weekly
+        identifier: leaderboard_weekly
+
+      - name: powerup
+        identifier: powerup
+
+      - name: prize_draw
+        identifier: prize_draw
+
+      - name: question
+        identifier: question
+
+      - name: question_attempt
+        identifier: question_category
+
+      - name: question_type
+        identifier: question_type
+
+      - name: quiz
+        identifier: quiz
+
+      - name: quiz_attempt
+        identifier: quiz_attempt
+
+      - name: user_achievement
+        identifier: user_achievement
+
+      - name: user_powerup
+        identifier: user_powerup
+
+      - name: user_powerup_log
+        identifier: user_powerup_log
+
+      - name: user_prize_draw_entry
+        identifier: user_prize_draw_entry
+
+      - name: winners
+        identifier: winners

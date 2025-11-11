@@ -32,3 +32,10 @@ clean-targets:         # directories to be removed by `dbt clean`
 models:
   low6_dbt_azureuksouth:
     # Config indicated by + and applies to all files under models/example/
+    core_user_service:
+      +schema: core_user_service
+      +query_tag: core_user_service
+
+    itv_spinoff:
+      +schema: itv_spinoff
+      +query_tag: itv_spinoff

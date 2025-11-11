@@ -1,0 +1,15 @@
+version: 2
+
+sources:
+
+  - name: core_user_service
+    description: low6 core user service
+    database: low6_azureuksouth
+    schema: adfcoreuserservice
+    tables:
+
+      - name: referrals
+        identifier: referrals
+
+      - name: users
+        identifier: users
