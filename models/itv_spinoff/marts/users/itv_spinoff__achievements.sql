@@ -49,7 +49,7 @@ joined as (
         on user_achievements.achievement_id = achievements.achievement_id
     left join achievement_categories
         on achievements.achievement_category_id = achievement_categories.achievement_category_id
-    left join users 
+    inner join users 
         on user_achievements.user_id = users.user_id
 
 )

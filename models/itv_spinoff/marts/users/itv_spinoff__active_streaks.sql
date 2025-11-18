@@ -26,7 +26,7 @@ joined as (
          active_streaks.last_played_at
     
     from active_streaks
-    left join users 
+    inner join users 
         on active_streaks.user_id = users.user_id
 
 )

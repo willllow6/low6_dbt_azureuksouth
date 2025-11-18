@@ -42,11 +42,11 @@ joined as (
         league_memberships.joined_at
 
     from league_memberships
-    left join leagues
+    inner join leagues
         on league_memberships.league_id = leagues.league_id
-    left join users as creators 
+    inner join users as creators 
         on leagues.creator_user_id = creators.user_id
-    left join users as members 
+    inner join users as members 
         on league_memberships.user_id = members.user_id
         
 )

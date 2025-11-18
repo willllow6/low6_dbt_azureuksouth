@@ -5,6 +5,7 @@ core_user_service as (
     select *
     from {{ ref('stg_core_user_service__users') }}
     where app_id = 'spin_off'
+    and user_created_date > '2025-11-17'
 
 ),
 

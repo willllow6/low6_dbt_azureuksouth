@@ -48,7 +48,7 @@ joined as (
     from quiz_attempts
     left join quizes
         on quiz_attempts.quiz_id = quizes.quiz_id
-    left join users
+    inner join users
         on quiz_attempts.user_id = users.user_id
 
 )

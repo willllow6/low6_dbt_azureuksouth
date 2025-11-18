@@ -48,6 +48,9 @@ sources:
         identifier: question
 
       - name: question_attempt
+        identifier: question_attempt
+
+      - name: question_category
         identifier: question_category
 
       - name: question_type
