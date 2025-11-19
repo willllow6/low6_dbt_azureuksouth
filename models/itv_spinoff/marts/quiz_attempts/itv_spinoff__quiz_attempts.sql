@@ -51,6 +51,18 @@ joined as (
     inner join users
         on quiz_attempts.user_id = users.user_id
 
+),
+
+ranked as (
+
+    select
+        *,
+        row_number() over(
+            partition by user_id
+            order by attempted_at
+        ) as user_attempt_number
+    from joined 
+
 )
 
-select * from joined
+select * from ranked

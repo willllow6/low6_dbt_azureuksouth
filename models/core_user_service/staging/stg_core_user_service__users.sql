@@ -24,8 +24,12 @@ renamed as (
         try_parse_json(consents) as consents_json,
         try_parse_json(meta) as meta_json,
         try_parse_json(profile) as profile_json,
-        try_parse_json(preferences) as prefernces_json,
-        prefernces_json:favouriteItvShow as favourite_itv_show,
+        try_parse_json(preferences) as preferences_json,
+        profile_json:firstName::string as first_name,
+        profile_json:lastName::string as last_name,
+        profile_json:county::string as county,
+        profile_json:phoneNumber::number as phone_number,
+        preferences_json:favouriteItvShow::string as favourite_itv_show,
         TRY_TO_DATE(PARSE_JSON(profile):dob::string) as dob,
         TRY_TO_DATE(PARSE_JSON(profile):dateOfBirth::string) as dateofbirth,
         coalesce(dob,dateofbirth) as date_of_birth,
@@ -59,7 +63,8 @@ renamed as (
         ---------- booleans
         email_verified as has_verified_email,
         coalesce(consents_json:marketing::boolean,false) as has_consented_marketing,
-        case when favourite_itv_show is not null then true else false end as has_completed_profile,
+        coalesce(meta_json:profileEverCompleted::boolean,false) as has_completed_profile,
+        coalesce(profile_json:isSkyVegasCustomer::boolean,false) as is_sky_vegas_customer,
         case when deleted_at is not null then true else false end as is_deleted,
 
         ---------- dates
