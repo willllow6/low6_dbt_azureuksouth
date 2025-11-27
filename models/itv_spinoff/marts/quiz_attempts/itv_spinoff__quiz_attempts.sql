@@ -42,6 +42,7 @@ joined as (
         quiz_attempts.total_points,
         quiz_attempts.is_complete,
         quiz_attempts.attempt_date,
+        quiz_attempts.attempt_hour,
         quiz_attempts.attempted_at
 
 

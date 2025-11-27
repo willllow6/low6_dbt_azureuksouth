@@ -69,6 +69,7 @@ renamed as (
 
         ---------- dates
         cast(created_at as date) as user_created_date,
+        hour(created_at) as user_created_hour,
         cast(email_verified_at as date) as email_verification_date,
 
         ---------- timestamps

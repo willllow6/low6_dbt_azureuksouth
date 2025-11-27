@@ -106,6 +106,7 @@ joined as (
         core_user_service.is_deleted,
         core_user_service.date_of_birth,
         core_user_service.user_created_date,
+        core_user_service.user_created_hour,
         core_user_service.email_verification_date,
         core_user_service.created_at,
         core_user_service.updated_at,

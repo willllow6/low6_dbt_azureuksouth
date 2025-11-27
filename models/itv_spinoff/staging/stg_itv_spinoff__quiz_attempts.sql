@@ -31,6 +31,7 @@ renamed as (
 
         ---------- dates
         cast(started_at as date) as attempt_date,
+        hour(started_at) as attempt_hour,
 
         ---------- timestamps
         started_at as attempted_at,
