@@ -47,6 +47,7 @@ daily_users as (
         sum(case when has_verified_email then 1 else 0 end) as registrations,
         sum(case when is_sky_vegas_customer then 1 else 0 end) as sky_vegas_customer_confirmations
     from users
+    where email not like 'fancymail%'
     group by 1
 
 ),
