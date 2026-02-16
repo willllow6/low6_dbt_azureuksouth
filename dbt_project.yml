@@ -39,3 +39,7 @@ models:
     itv_spinoff:
       +schema: itv_spinoff
       +query_tag: itv_spinoff
+    
+    prizekings_comps:
+      +schema: prizekings_comps
+      +query_tag: prizekings_comps

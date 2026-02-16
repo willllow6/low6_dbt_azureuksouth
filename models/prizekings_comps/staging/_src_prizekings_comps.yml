@@ -1,0 +1,24 @@
+version: 2
+
+sources:
+
+  - name: prizekings_comps
+    description: prizekings competitions database
+    database: low6_azureuksouth
+    schema: adfprizekingsraffle
+    tables:
+
+      - name: competition
+      - name: competition_entry
+      - name: competition_prize
+      - name: promotions
+      - name: promotion_tenants
+      - name: user_promotions
+      - name: raffles
+      - name: prizes
+      - name: user_raffle_tickets
+      - name: transactions
+      - name: tenants
+      - name: languages
+      - name: translations
+      - name: users
