@@ -76,3 +76,15 @@ sources:
 
       - name: winners
         identifier: winners
+
+  - name: itv_spinoff_live
+    description: itv spinoff live
+    database: low6_azureuksouth
+    schema: adfitvspinofflive
+    tables:
+
+      - name: livequizzes
+      - name: players
+      - name: playeranswers
+      - name: livequizquestions
+  

@@ -3,14 +3,14 @@ with
 quiz_attempts as (
 
     select *
-    from {{ ref('stg_itv_spinoff__quiz_attempts') }}
+    from {{ ref('int_itv_spinoff__quiz_attempts_ranked') }}
 
 ),
 
 quizes as (
 
     select *
-    from {{ ref('stg_itv_spinoff__quizes') }}
+    from {{ ref('int_itv_spinoff__quizes_unioned') }}
 
 ),
 
@@ -40,30 +40,17 @@ joined as (
         quiz_attempts.streak_bonus,
         quiz_attempts.end_of_quiz_bonus,
         quiz_attempts.total_points,
+        quiz_attempts.user_attempt_number,
         quiz_attempts.is_complete,
         quiz_attempts.attempt_date,
         quiz_attempts.attempt_hour,
         quiz_attempts.attempted_at
-
-
     from quiz_attempts
     left join quizes
         on quiz_attempts.quiz_id = quizes.quiz_id
     inner join users
         on quiz_attempts.user_id = users.user_id
 
-),
-
-ranked as (
-
-    select
-        *,
-        row_number() over(
-            partition by user_id
-            order by attempted_at
-        ) as user_attempt_number
-    from joined 
-
 )
 
-select * from ranked
+select * from joined
