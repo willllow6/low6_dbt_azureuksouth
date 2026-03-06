@@ -2,15 +2,16 @@ with
 
 date_generator as (
 
-    select dateadd(day, seq4(), '2026-01-23'::date) as date_day
+    select dateadd(day, seq4(), '2026-02-11'::date) as date_day
     from table(generator(rowcount => 600))
-    where dateadd(day, seq4(), '2026-01-23'::date) <= current_date()
+    where dateadd(day, seq4(), '2026-02-11'::date) <= sysdate()
 
 ),
 
 tenants as (
 
     select
+        tenant_id,
         tenant_name
     from {{ ref('dim_prizekings_comps__tenants') }}
 
@@ -55,6 +56,7 @@ date_tenants as (
 
     select
         date_day,
+        tenant_id,
         tenant_name
     from date_generator
     join tenants
@@ -84,19 +86,19 @@ joined as (
     from date_tenants as dt 
     left join registrations as r 
         on dt.date_day = r.registration_date
-        and dt.tenant_name = r.tenant_name
+        and dt.tenant_id = r.tenant_id
     left join user_activity as ua 
         on dt.date_day = ua.activity_date
-        and dt.tenant_name = ua.tenant_name
+        and dt.tenant_id = ua.tenant_id
     left join entries as e 
         on dt.date_day = e.entry_date
-        and dt.tenant_name = e.tenant_name
+        and dt.tenant_id = e.tenant_id
     left join deposits as d 
         on dt.date_day = d.deposit_date
-        and dt.tenant_name = d.tenant_name
+        and dt.tenant_id = d.tenant_id
     left join financials as f 
         on dt.date_day = f.transaction_date
-        and dt.tenant_name = f.tenant_name
+        and dt.tenant_id = f.tenant_id
 
 )
 

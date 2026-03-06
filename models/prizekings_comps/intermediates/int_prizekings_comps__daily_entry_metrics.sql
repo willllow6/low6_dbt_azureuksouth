@@ -18,7 +18,7 @@ entry_metrics as (
 
     select
         cast(entries.created_at as date) as entry_date,
-        competitions.tenant_name,
+        competitions.tenant_id,
         count(*) as total_entries,
         sum(case when user_entry_number = 1 then 1 else 0 end) as first_user_entries,
         sum(case when entries.is_winner then 1 else 0 end ) as total_winning_entries

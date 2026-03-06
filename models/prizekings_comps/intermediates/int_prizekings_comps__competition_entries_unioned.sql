@@ -20,6 +20,7 @@ unioned as (
         entry_sk,
         competition_sk,
         user_id,
+        prize_sk,
         is_winner,
         created_at
     from stb_entries
@@ -30,6 +31,7 @@ unioned as (
         entry_sk,
         competition_sk,
         user_id,
+        prize_sk,
         is_winner,
         created_at
     from draw_entries

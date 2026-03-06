@@ -22,17 +22,19 @@ renamed as (
             when raffle_id is not null
                 then 'DRAW_' || raffle_id
             when competition_id is not null
-                then 'SPB_' || competition_id
+                then 'STB_' || competition_id
             else null
         end as competition_sk,
         metadata:prizeId::string as prize_id,
 
         ---------- strings
         balance_type,
+        metadata:source::string as transaction_source,
         transaction_type as transaction_direction,
         status as transaction_status,
         payment_provider,
         payment_reference,
+        
 
         metadata as meta_data_json,
         

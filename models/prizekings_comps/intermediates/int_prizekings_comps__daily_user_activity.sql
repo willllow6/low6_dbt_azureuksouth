@@ -18,7 +18,7 @@ entry_metrics as (
 
     select
         cast(entries.created_at as date) as activity_date,
-        competitions.tenant_name,
+        competitions.tenant_id,
         count(distinct user_id) as active_players
     from entries
     inner join competitions

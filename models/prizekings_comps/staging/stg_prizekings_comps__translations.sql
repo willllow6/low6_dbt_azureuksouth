@@ -31,8 +31,8 @@ renamed as (
         ---------- strings
         data_type,
         data as data_json,
-        data:desc::string as translation_name,
-        data:name::string as translation_description,
+        data:name::string as translation_name,
+        data:desc::string as translation_description,
         -- content_type,
 
         ---------- numerics

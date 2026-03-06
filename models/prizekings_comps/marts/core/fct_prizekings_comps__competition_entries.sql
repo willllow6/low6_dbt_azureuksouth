@@ -19,6 +19,7 @@ select
     entry_sk,
     competition_sk,
     user_id,
+    prize_sk,
     is_winner,
     user_entry_number,
     created_at
