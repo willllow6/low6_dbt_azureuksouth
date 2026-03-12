@@ -47,3 +47,8 @@ prizekings as (
 
 select *
 from itv_spinoff
+
+union all
+
+select *
+from prizekings
