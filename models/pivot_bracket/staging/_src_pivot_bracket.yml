@@ -1,0 +1,20 @@
+version: 2
+
+sources:
+                    
+  - name: pivot_bracket
+    description: pivot bracket db
+    database: low6_azureuksouth
+    schema: adfpivotbracket
+    tags: ['pivot']
+    tables:
+      - name: brackets
+      - name: customers
+      - name: matchups
+      - name: regions
+      - name: rounds
+      - name: selection_matchups
+      - name: teams
+      - name: tournaments
+      - name: users
+      - name: user_selection

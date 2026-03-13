@@ -43,3 +43,7 @@ models:
     prizekings_comps:
       +schema: prizekings_comps
       +query_tag: prizekings_comps
+
+    pivot_bracket:
+      +schema: pivot_bracket
+      +query_tag: pivot_bracket
