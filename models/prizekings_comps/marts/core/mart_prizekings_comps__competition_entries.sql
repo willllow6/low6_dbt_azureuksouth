@@ -45,10 +45,10 @@ select
     p.value as prize_value,
     t.tenant_name,
     e.created_at
-from {{ ref('fct_prizekings_comps__competition_entries') }} as e
-inner join {{ ref('dim_prizekings_comps__competitions') }} as c
+from entries as e
+inner join competitions as c
     on e.competition_sk = c.competition_sk
-left join  {{ ref('dim_prizekings_comps__prizes') }} as p
+left join prizes as p
     on e.prize_sk = p.prize_sk
-left join {{ ref('dim_prizekings_comps__tenants') }} as t
+left join tenants as t
     on c.tenant_id = t.tenant_id

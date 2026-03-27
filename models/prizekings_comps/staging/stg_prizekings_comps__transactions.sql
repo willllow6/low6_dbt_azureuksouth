@@ -18,11 +18,11 @@ renamed as (
         promotion_id,
         user_promotion_id,
         metadata:competitionId::integer as competition_id,
-        case 
+        case
             when raffle_id is not null
                 then 'DRAW_' || raffle_id
-            when competition_id is not null
-                then 'STB_' || competition_id
+            when metadata:competitionId::integer is not null
+                then 'STB_' || metadata:competitionId::integer
             else null
         end as competition_sk,
         metadata:prizeId::string as prize_id,
@@ -47,7 +47,7 @@ renamed as (
         ---------- dates
 
         ---------- timestamps
-        meta_data_json:externalPaymentData.paymentDate::timestamp_tz AS payment_processed_at,
+        metadata:externalPaymentData.paymentDate::timestamp_tz AS payment_processed_at,
         created_at,
         updated_at
 

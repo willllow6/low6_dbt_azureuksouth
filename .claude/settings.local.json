@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/Users/WillBreeden/low6_dbt/models/opap_picks/staging//**)",
+      "Read(//c/Users/WillBreeden/low6_dbt/models/oddschecker_predictor/staging//**)",
+      "Read(//c/Users/WillBreeden/low6_dbt_azureeastus2/models/bet99_picks/staging/**)",
+      "Read(//c/Users/WillBreeden/low6_dbt_azureeastus2/models/saracen/marts/intermediate/**)",
+      "Read(//c/Users/WillBreeden/low6_dbt_azureeastus2/models/saracen/marts/core/**)",
+      "Read(//c/Users/WillBreeden/low6_dbt_azureeastus2/models/saracen/marts/games/picks/**)",
+      "Read(//c/Users/WillBreeden/low6_dbt_azureeastus2/models/saracen/**)",
+      "Read(//c/Users/WillBreeden/low6_dbt_azureeastus2/models/betway_picks/staging/**)",
+      "Read(//c/Users/WillBreeden/.claude/**)",
+      "Read(//c/Users/WillBreeden/low6_dbt_us/templates/picks_template/marts/agg/**)"
+    ],
+    "additionalDirectories": [
+      "C:\\Users\\WillBreeden\\low6_dbt_us\\models\\picks_template\\staging",
+      "C:\\Users\\WillBreeden\\low6_dbt_us\\models\\picks_template\\marts\\core",
+      "C:\\Users\\WillBreeden\\low6_dbt_us\\models\\picks_template\\marts\\agg",
+      "C:\\Users\\WillBreeden\\low6_dbt_us\\models\\picks_template\\marts",
+      "C:\\Users\\WillBreeden\\.claude"
+    ]
+  }
+}

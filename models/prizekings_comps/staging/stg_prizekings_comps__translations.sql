@@ -33,12 +33,10 @@ renamed as (
         data as data_json,
         data:name::string as translation_name,
         data:desc::string as translation_description,
-        -- content_type,
 
         ---------- numerics
 
         ---------- booleans
-        -- is_active,
 
         ---------- dates
 

@@ -1,0 +1,141 @@
+version: 2
+
+models:
+
+  - name: stg_prizekings_comps__competition
+    columns:
+      - name: competition_sk
+        tests:
+          - unique
+          - not_null
+      - name: competition_id
+        tests:
+          - unique
+          - not_null
+      - name: tenant_id
+        tests:
+          - not_null
+      - name: competition_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['spot_the_ball']
+      - name: competition_status
+        tests:
+          - not_null
+
+  - name: stg_prizekings_comps__raffles
+    columns:
+      - name: competition_sk
+        tests:
+          - unique
+          - not_null
+      - name: competition_id
+        tests:
+          - unique
+          - not_null
+      - name: tenant_id
+        tests:
+          - not_null
+      - name: competition_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['draw']
+
+  - name: stg_prizekings_comps__competition_entry
+    columns:
+      - name: entry_sk
+        tests:
+          - unique
+          - not_null
+      - name: entry_id
+        tests:
+          - unique
+          - not_null
+      - name: competition_id
+        tests:
+          - not_null
+      - name: user_id
+        tests:
+          - not_null
+
+  - name: stg_prizekings_comps__user_raffle_tickets
+    columns:
+      - name: entry_sk
+        tests:
+          - unique
+          - not_null
+      - name: entry_id
+        tests:
+          - unique
+          - not_null
+      - name: competition_id
+        tests:
+          - not_null
+      - name: user_id
+        tests:
+          - not_null
+
+  - name: stg_prizekings_comps__transactions
+    columns:
+      - name: transaction_id
+        tests:
+          - unique
+          - not_null
+      - name: user_id
+        tests:
+          - not_null
+      - name: transaction_direction
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['incoming', 'outgoing']
+      - name: balance_type
+        tests:
+          - accepted_values:
+              values: ['deposit', 'site_credit']
+
+  - name: stg_prizekings_comps__users
+    columns:
+      - name: user_id
+        tests:
+          - unique
+          - not_null
+      - name: tenant_id
+        tests:
+          - not_null
+
+  - name: stg_prizekings_comps__tenants
+    columns:
+      - name: tenant_id
+        tests:
+          - unique
+          - not_null
+
+  - name: stg_prizekings_comps__promotions
+    columns:
+      - name: promotion_id
+        tests:
+          - unique
+          - not_null
+
+  - name: stg_prizekings_comps__competition_prize
+    columns:
+      - name: prize_sk
+        tests:
+          - unique
+          - not_null
+      - name: competition_id
+        tests:
+          - not_null
+
+  - name: stg_prizekings_comps__prizes
+    columns:
+      - name: prize_sk
+        tests:
+          - unique
+          - not_null
+      - name: competition_id
+        tests:
+          - not_null

@@ -22,7 +22,6 @@ renamed as (
 
         ---------- numerics
         quantity,
-        -- tier,
         prize_value as value,
         assigned_count,
 

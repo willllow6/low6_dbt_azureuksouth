@@ -29,6 +29,10 @@ clean-targets:         # directories to be removed by `dbt clean`
 # In this example config, we tell dbt to build all models in the example/
 # directory as views. These settings can be overridden in the individual model
 # files using the `{{ config(...) }}` macro.
+vars:
+  prizekings_start_date: '2026-02-11'
+  local_timezone: 'Europe/London'
+
 models:
   low6_dbt_azureuksouth:
     # Config indicated by + and applies to all files under models/example/

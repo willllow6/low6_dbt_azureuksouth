@@ -2,9 +2,9 @@ with
 
 date_generator as (
 
-    select dateadd(day, seq4(), '2026-02-11'::date) as date_day
+    select dateadd(day, seq4(), '{{ var("prizekings_start_date") }}'::date) as date_day
     from table(generator(rowcount => 600))
-    where dateadd(day, seq4(), '2026-02-11'::date) <= sysdate()
+    where dateadd(day, seq4(), '{{ var("prizekings_start_date") }}'::date) <= sysdate()
 
 ),
 
@@ -20,35 +20,35 @@ tenants as (
 registrations as (
 
     select *
-    from {{ ref('int_prizekings_comps__daily_registration_metrics') }}
+    from {{ ref('agg_prizekings_comps__registration_metrics_daily') }}
 
 ),
 
 user_activity as (
 
     select *
-    from {{ ref('int_prizekings_comps__daily_user_activity') }}
+    from {{ ref('agg_prizekings_comps__user_activity_daily') }}
 
 ),
 
 entries as (
 
     select *
-    from {{ ref('int_prizekings_comps__daily_entry_metrics') }}
+    from {{ ref('agg_prizekings_comps__entry_metrics_daily') }}
 
 ),
 
 deposits as (
 
     select *
-    from {{ ref('int_prizekings_comps__daily_deposit_metrics') }}
+    from {{ ref('agg_prizekings_comps__deposit_metrics_daily') }}
 
 ),
 
 financials as (
 
     select *
-    from {{ ref('int_prizekings_comps__daily_financial_metrics') }}
+    from {{ ref('agg_prizekings_comps__financial_metrics_daily') }}
     
 ),
 

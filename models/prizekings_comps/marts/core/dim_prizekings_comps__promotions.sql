@@ -1,15 +1,31 @@
+with
+
+promotions as (
+
+    select *
+    from {{ ref('stg_prizekings_comps__promotions') }}
+
+),
+
+promotion_tenants as (
+
+    select *
+    from {{ ref('stg_prizekings_comps__promotion_tenants') }}
+
+)
+
 select
-    p.promotion_id,
-    pt.tenant_id,
-    p.promotion_type,
-    p.bonus_type,
-    p.qualification_value,
-    p.reward_value,
-    p.is_active,
-    p.starts_at,
-    p.ends_at,
-    p.created_at,
-    p.updated_at
-from {{ ref('stg_prizekings_comps__promotions') }} as p
-left join {{ ref('stg_prizekings_comps__promotion_tenants') }} as pt
-    on p.promotion_id = pt.promotion_id
+    promotions.promotion_id,
+    promotion_tenants.tenant_id,
+    promotions.promotion_type,
+    promotions.bonus_type,
+    promotions.qualification_value,
+    promotions.reward_value,
+    promotions.is_active,
+    promotions.starts_at,
+    promotions.ends_at,
+    promotions.created_at,
+    promotions.updated_at
+from promotions
+left join promotion_tenants
+    on promotions.promotion_id = promotion_tenants.promotion_id

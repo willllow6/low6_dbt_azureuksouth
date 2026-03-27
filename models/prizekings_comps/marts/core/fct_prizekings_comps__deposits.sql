@@ -13,7 +13,7 @@ deposits as (
         meta_data_json,
         payment_processed_at,
         created_at as transaction_created_at,
-        updated_at as transaciont_updated_at
+        updated_at as transaction_updated_at
     from {{ ref('stg_prizekings_comps__transactions') }}
     where payment_reference is not null
     and transaction_direction = 'incoming'

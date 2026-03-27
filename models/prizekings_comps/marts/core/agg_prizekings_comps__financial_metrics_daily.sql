@@ -17,7 +17,7 @@ users as (
 
 base as (
 
-    select 
+    select
         cast(transactions.created_at as date) as transaction_date,
         users.tenant_id,
         sum(case when transaction_direction = 'outgoing' then amount else 0 end) as gross_entry_revenue,
@@ -26,8 +26,8 @@ base as (
         sum(case when transaction_direction = 'incoming' then amount else 0 end) as total_prize_value_awarded,
         sum(case when transaction_direction = 'incoming' and balance_type = 'deposit' then amount else 0 end) as cash_prize_value_awarded,
         sum(case when transaction_direction = 'incoming' and balance_type = 'site_credit' then amount else 0 end) as credit_prize_value_awarded
-    from transactions 
-    left join users 
+    from transactions
+    left join users
         on transactions.user_id = users.user_id
     group by 1,2
 

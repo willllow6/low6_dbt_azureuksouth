@@ -1,0 +1,31 @@
+version: 2
+
+models:
+
+  - name: int_prizekings_comps__competitions_unioned
+    columns:
+      - name: competition_sk
+        tests:
+          - unique
+          - not_null
+      - name: tenant_id
+        tests:
+          - not_null
+      - name: competition_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['spot_the_ball', 'draw']
+
+  - name: int_prizekings_comps__competition_entries_unioned
+    columns:
+      - name: entry_sk
+        tests:
+          - unique
+          - not_null
+      - name: competition_sk
+        tests:
+          - not_null
+      - name: user_id
+        tests:
+          - not_null

@@ -1,3 +1,12 @@
+with
+
+users as (
+
+    select *
+    from {{ ref('stg_prizekings_comps__users') }}
+
+)
+
 select
     user_id,
     tenant_id,
@@ -10,4 +19,4 @@ select
     is_active,
     created_at,
     updated_at
-from {{ ref('stg_prizekings_comps__users') }}
+from users

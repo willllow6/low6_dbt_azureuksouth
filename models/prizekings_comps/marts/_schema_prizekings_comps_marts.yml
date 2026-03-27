@@ -1,0 +1,116 @@
+version: 2
+
+models:
+
+  - name: dim_prizekings_comps__competitions
+    columns:
+      - name: competition_sk
+        tests:
+          - unique
+          - not_null
+      - name: tenant_id
+        tests:
+          - not_null
+      - name: competition_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['spot_the_ball', 'draw']
+
+  - name: dim_prizekings_comps__prizes
+    columns:
+      - name: prize_sk
+        tests:
+          - unique
+          - not_null
+      - name: competition_sk
+        tests:
+          - not_null
+
+  - name: dim_prizekings_comps__users
+    columns:
+      - name: user_id
+        tests:
+          - unique
+          - not_null
+      - name: tenant_id
+        tests:
+          - not_null
+
+  - name: dim_prizekings_comps__tenants
+    columns:
+      - name: tenant_id
+        tests:
+          - unique
+          - not_null
+
+  - name: dim_prizekings_comps__promotions
+    columns:
+      - name: promotion_id
+        tests:
+          - not_null
+
+  - name: fct_prizekings_comps__competition_entries
+    columns:
+      - name: entry_sk
+        tests:
+          - unique
+          - not_null
+      - name: competition_sk
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_prizekings_comps__competitions')
+              field: competition_sk
+      - name: user_id
+        tests:
+          - not_null
+
+  - name: fct_prizekings_comps__deposits
+    columns:
+      - name: transaction_id
+        tests:
+          - unique
+          - not_null
+      - name: user_id
+        tests:
+          - not_null
+
+  - name: fct_prizekings_comps__prize_awards
+    columns:
+      - name: entry_sk
+        tests:
+          - unique
+          - not_null
+      - name: competition_sk
+        tests:
+          - not_null
+      - name: user_id
+        tests:
+          - not_null
+
+  - name: fct_prizekings_comps__user_promotions
+    columns:
+      - name: user_promotion_id
+        tests:
+          - unique
+          - not_null
+      - name: user_id
+        tests:
+          - not_null
+      - name: promotion_id
+        tests:
+          - not_null
+
+  - name: mart_prizekings_comps__competition_entries
+    columns:
+      - name: entry_sk
+        tests:
+          - unique
+          - not_null
+      - name: competition_sk
+        tests:
+          - not_null
+      - name: user_id
+        tests:
+          - not_null
