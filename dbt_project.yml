@@ -51,3 +51,7 @@ models:
     pivot_bracket:
       +schema: pivot_bracket
       +query_tag: pivot_bracket
+
+    seven_days:
+      +schema: seven_days
+      +query_tag: seven_days

@@ -1,0 +1,15 @@
+version: 2
+
+sources:
+
+  - name: seven_days
+    description: 7 Days Performance games prod database
+    database: low6_azureuksouth
+    schema: adf7days
+    tables:
+
+      - name: sessions
+        identifier: session
+
+      - name: games
+        identifier: game

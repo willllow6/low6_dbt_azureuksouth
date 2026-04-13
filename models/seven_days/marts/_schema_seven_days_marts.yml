@@ -1,0 +1,76 @@
+version: 2
+
+models:
+
+  - name: mart_seven_days__entries
+    description: >
+      Wide denormalised entry table. One row per individual ticket play, joining game
+      metadata from stg_seven_days__games. game_name and game_description are set to
+      'Test' for non-production games (ticket_price is null). Primary BI drill-through
+      table for entry-level analysis.
+    columns:
+      - name: entry_id
+        description: Primary key.
+        tests:
+          - unique
+          - not_null
+      - name: session_id
+        description: FK to the parent purchase session.
+        tests:
+          - not_null
+      - name: user_id
+        tests:
+          - not_null
+      - name: client_id
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['7days_performance']
+      - name: tenant_id
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['seven_days_performance', 'ukcc']
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['instant_win']
+      - name: prize_tier
+        description: Integer prize tier from the ticket JSON.
+      - name: is_played
+        description: Whether the user has revealed this entry.
+        tests:
+          - not_null
+      - name: game_name
+        description: Production game name, or 'Test' for non-production games.
+        tests:
+          - not_null
+      - name: game_description
+        description: Formatted entry price string (e.g. '£0.99 Entry'), or 'Test'.
+        tests:
+          - not_null
+
+  - name: agg_seven_days__entries_daily
+    description: >
+      Daily entry metrics grouped by game, prize tier, and prize attributes. Used for
+      revenue reporting (total_sales) and prize payout analysis (prizes, first_entries).
+    columns:
+      - name: date_day
+        tests:
+          - not_null
+      - name: client_id
+        tests:
+          - not_null
+      - name: tenant_id
+        tests:
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['instant_win']
+      - name: entries
+        description: Total entry count for this dimension group.
+        tests:
+          - not_null

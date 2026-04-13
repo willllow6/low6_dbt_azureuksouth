@@ -1,0 +1,88 @@
+version: 2
+
+models:
+
+  - name: stg_seven_days__sessions
+    description: >
+      One row per deduplicated session. A session represents a single purchase, grouping
+      one or more instant win entries bought together. The raw ticket JSON array is parsed
+      and carried forward to the intermediates layer for flattening into entry grain.
+    columns:
+      - name: session_id
+        description: Primary key — business key from the source session table.
+        tests:
+          - unique
+          - not_null
+      - name: user_id
+        description: FK to the user who played this session.
+        tests:
+          - not_null
+      - name: game_id
+        description: FK to the game configuration the session belongs to.
+        tests:
+          - not_null
+      - name: client_id
+        description: Hardcoded client identifier — always '7days_performance'.
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['7days_performance']
+      - name: tenant_id
+        description: Tenant derived from the site URL ('seven_days_performance' or 'ukcc').
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['seven_days_performance', 'ukcc']
+      - name: tenant_name
+        description: Human-readable tenant label ('7 Days Performance' or 'UKCC').
+        tests:
+          - not_null
+      - name: game_type
+        description: Hardcoded game type for this domain.
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['instant_win']
+      - name: created_at
+        description: Timestamp of when the session was created (UTC).
+        tests:
+          - not_null
+
+  - name: stg_seven_days__games
+    description: >
+      One row per game configuration per site. A game represents a specific instant win
+      product (e.g. Pirate Quest at £0.99). game_description and is_prod are derived
+      from ticket_price.
+    columns:
+      - name: game_id
+        description: Primary key — game configuration identifier from source.
+        tests:
+          - not_null
+      - name: site_id
+        description: Integer site identifier (1 = 7 Days Performance, 2 = UKCC).
+        tests:
+          - not_null
+      - name: client_id
+        description: Hardcoded client identifier — always '7days_performance'.
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['7days_performance']
+      - name: tenant_id
+        description: Tenant derived from site_id.
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['seven_days_performance', 'ukcc']
+      - name: game_type
+        description: Hardcoded game type for this domain.
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['instant_win']
+      - name: game_name
+        description: Cleaned game name with dashes and seasonal suffixes removed.
+      - name: is_prod
+        description: True if ticket_price is set (production game), false for test games.
+        tests:
+          - not_null
