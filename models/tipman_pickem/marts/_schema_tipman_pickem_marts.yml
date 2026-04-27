@@ -1,0 +1,303 @@
+version: 2
+
+models:
+
+  - name: dim_tipman_pickem__tenants
+    description: Tenant (league/region) dimension for the tipman picks game.
+    columns:
+      - name: tenant_id
+        tests:
+          - unique
+          - not_null
+      - name: client_id
+        tests:
+          - not_null
+      - name: tenant_code
+        tests:
+          - unique
+          - not_null
+
+  - name: dim_tipman_pickem__contests
+    description: Contest dimension enriched with tenant name.
+    columns:
+      - name: contest_id
+        tests:
+          - unique
+          - not_null
+      - name: client_id
+        tests:
+          - not_null
+      - name: tenant_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_tipman_pickem__tenants')
+              field: tenant_id
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['pickem']
+      - name: contest_status
+        tests:
+          - not_null
+
+  - name: dim_tipman_pickem__users
+    description: User dimension with tenant resolved from location → tenant_code join.
+    columns:
+      - name: user_id
+        tests:
+          - unique
+          - not_null
+      - name: client_id
+        tests:
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['pickem']
+      - name: registration_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['sso', 'form']
+      - name: registered_at
+        tests:
+          - not_null
+
+  - name: fct_tipman_pickem__entries
+    description: Entry fact table at user × contest grain, sourced from int_tipman_pickem__entries.
+    columns:
+      - name: entry_id
+        tests:
+          - unique
+          - not_null
+      - name: user_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_tipman_pickem__users')
+              field: user_id
+      - name: contest_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_tipman_pickem__contests')
+              field: contest_id
+      - name: client_id
+        tests:
+          - not_null
+      - name: tenant_id
+        tests:
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['pickem']
+      - name: entered_at
+        tests:
+          - not_null
+
+  - name: mart_tipman_pickem__user_activity_daily
+    description: Row-level mart with one row per user per day they were active (made at least one entry). BI drill-through layer.
+    columns:
+      - name: activity_date
+        tests:
+          - not_null
+      - name: user_id
+        tests:
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['pickem']
+
+  - name: mart_tipman_pickem__entries
+    description: Wide denormalized entry table joining fct + dim_users + dim_contests. BI drill-through layer.
+    columns:
+      - name: entry_id
+        tests:
+          - unique
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['pickem']
+
+  - name: mart_tipman_pickem__selections
+    description: Wide denormalized selection table joining stg_selections + users + contests + questions + options.
+    columns:
+      - name: selection_id
+        tests:
+          - unique
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['pickem']
+
+  - name: mart_tipman_pickem__contest_performance
+    description: >
+      One row per contest with aggregated performance metrics — entry counts, unique entrants,
+      average and max points, total selections, and question count. BI drill-through layer.
+    columns:
+      - name: contest_id
+        tests:
+          - unique
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['pickem']
+
+  - name: mart_tipman_pickem__contest_leaderboard_positions
+    description: Contest leaderboard positions enriched with entry and user context.
+    columns:
+      - name: contest_leaderboard_id
+        tests:
+          - unique
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['pickem']
+
+  - name: mart_tipman_pickem__period_leaderboard_positions
+    description: Period (aggregate) leaderboard positions enriched with tenant and user context.
+    columns:
+      - name: period_leaderboard_id
+        tests:
+          - unique
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['pickem']
+
+  - name: agg_tipman_pickem__registration_metrics_daily
+    description: Daily registration counts by tenant and registration type.
+    columns:
+      - name: date_day
+        tests:
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['pickem']
+
+  - name: agg_tipman_pickem__user_activity_daily
+    description: Daily active users, new registrations, and returning users by tenant.
+    columns:
+      - name: date_day
+        tests:
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['pickem']
+
+  - name: agg_tipman_pickem__entry_metrics_daily
+    description: Daily entry volume, unique entrants, and first-time entrants by tenant.
+    columns:
+      - name: date_day
+        tests:
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['pickem']
+
+  - name: agg_tipman_pickem__contest_metrics_daily
+    description: Daily contest counts by status (scheduled/live/completed) and average entries per contest.
+    columns:
+      - name: date_day
+        tests:
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['pickem']
+
+  - name: agg_tipman_pickem__conversion_funnel_daily
+    description: Cumulative daily funnel — registered, activated, activation rate, repeat entrants, repeat rate.
+    columns:
+      - name: date_day
+        tests:
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['pickem']
+
+  - name: agg_tipman_pickem__cohort_retention_weekly
+    description: Weekly cohort retention — users retained (made an entry) by weeks since registration week.
+    columns:
+      - name: cohort_week
+        tests:
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['pickem']
+
+  - name: agg_tipman_pickem__selection_metrics_daily
+    description: Daily selection volume and accuracy rate by contest and tenant.
+    columns:
+      - name: date_day
+        tests:
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['pickem']
+
+  - name: agg_tipman_pickem__entries_hourly
+    description: Entry counts by local date and hour, with hour formatted as "HH:00 - HH:59". Includes total entries, unique entrants, and first-time entrants.
+    columns:
+      - name: date_day
+        tests:
+          - not_null
+      - name: hour_of_day
+        tests:
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['pickem']
+
+  - name: agg_tipman_pickem__growth_metrics_daily
+    description: >
+      Dashboard-facing wide daily summary joining registrations, user activity, entry metrics,
+      and contest metrics over a full date spine. One row per date × tenant, with zeroes for
+      days with no activity.
+    columns:
+      - name: date_day
+        tests:
+          - not_null
+      - name: client_id
+        tests:
+          - not_null
+      - name: tenant_id
+        tests:
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['pickem']

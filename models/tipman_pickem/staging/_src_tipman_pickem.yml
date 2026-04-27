@@ -1,0 +1,26 @@
+version: 2
+
+sources:
+
+  - name: tipman_pickem
+    description: tipman picks prod db
+    database: low6_azureuksouth
+    schema: adftipmanpickem
+    tags: ['tipman']
+    tables:
+
+      - name: aggregate_leaderboards
+
+      - name: leagues
+
+      - name: options
+
+      - name: pickem_leaderboards
+
+      - name: pickems
+
+      - name: questions
+
+      - name: user_selections
+
+      - name: users

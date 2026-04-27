@@ -10,7 +10,9 @@
       "Read(//c/Users/WillBreeden/low6_dbt_azureeastus2/models/saracen/**)",
       "Read(//c/Users/WillBreeden/low6_dbt_azureeastus2/models/betway_picks/staging/**)",
       "Read(//c/Users/WillBreeden/.claude/**)",
-      "Read(//c/Users/WillBreeden/low6_dbt_us/templates/picks_template/marts/agg/**)"
+      "Read(//c/Users/WillBreeden/low6_dbt_us/templates/picks_template/marts/agg/**)",
+      "Read(//c/Users/WillBreeden//**)",
+      "Read(//c/Users/WillBreeden/**)"
     ],
     "additionalDirectories": [
       "C:\\Users\\WillBreeden\\low6_dbt_us\\models\\picks_template\\staging",

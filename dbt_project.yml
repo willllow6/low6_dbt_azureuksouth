@@ -31,6 +31,7 @@ clean-targets:         # directories to be removed by `dbt clean`
 # files using the `{{ config(...) }}` macro.
 vars:
   prizekings_start_date: '2026-02-11'
+  tipman_start_date: '2026-04-24'  # TODO: confirm tipman go-live date
   local_timezone: 'Europe/London'
 
 models:
@@ -55,3 +56,7 @@ models:
     seven_days:
       +schema: seven_days
       +query_tag: seven_days
+
+    tipman_pickem:
+      +schema: tipman_pickem
+      +query_tag: tipman_pickem

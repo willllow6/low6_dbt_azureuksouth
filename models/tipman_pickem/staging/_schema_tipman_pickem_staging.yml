@@ -1,0 +1,149 @@
+version: 2
+
+models:
+
+  - name: stg_tipman_pickem__tenants
+    description: Tenant partitions (leagues) for the tipman picks game.
+    columns:
+      - name: tenant_id
+        tests:
+          - unique
+          - not_null
+      - name: client_id
+        tests:
+          - not_null
+      - name: tenant_code
+        tests:
+          - unique
+          - not_null
+      - name: tenant_name
+        tests:
+          - not_null
+
+  - name: stg_tipman_pickem__contests
+    description: Pickem contests (pickems) for the tipman picks game.
+    columns:
+      - name: contest_id
+        tests:
+          - unique
+          - not_null
+      - name: tenant_id
+        tests:
+          - not_null
+      - name: client_id
+        tests:
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['pickem']
+      - name: contest_status
+        tests:
+          - not_null
+
+  - name: stg_tipman_pickem__users
+    description: Registered users in the tipman picks game. Service accounts excluded.
+    columns:
+      - name: user_id
+        tests:
+          - unique
+          - not_null
+      - name: client_id
+        tests:
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['pickem']
+      - name: registration_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['sso', 'form']
+      - name: registered_at
+        tests:
+          - not_null
+
+  - name: stg_tipman_pickem__selections
+    description: Individual user picks within a contest. Source grain for this domain.
+    columns:
+      - name: selection_id
+        tests:
+          - unique
+          - not_null
+      - name: entry_id
+        tests:
+          - not_null
+      - name: user_id
+        tests:
+          - not_null
+      - name: contest_id
+        tests:
+          - not_null
+      - name: client_id
+        tests:
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['pickem']
+
+  - name: stg_tipman_pickem__questions
+    description: Questions belonging to each pickem contest.
+    columns:
+      - name: question_id
+        tests:
+          - unique
+          - not_null
+      - name: contest_id
+        tests:
+          - not_null
+
+  - name: stg_tipman_pickem__options
+    description: Answer options for each question.
+    columns:
+      - name: option_id
+        tests:
+          - unique
+          - not_null
+      - name: question_id
+        tests:
+          - not_null
+
+  - name: stg_tipman_pickem__period_leaderboards
+    description: Aggregate (period-scoped) leaderboard positions per user.
+    columns:
+      - name: period_leaderboard_id
+        tests:
+          - unique
+          - not_null
+      - name: user_id
+        tests:
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['pickem']
+
+  - name: stg_tipman_pickem__contest_leaderboards
+    description: Contest-level leaderboard positions per user.
+    columns:
+      - name: contest_leaderboard_id
+        tests:
+          - unique
+          - not_null
+      - name: user_id
+        tests:
+          - not_null
+      - name: contest_id
+        tests:
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['pickem']

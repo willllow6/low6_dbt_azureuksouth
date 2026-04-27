@@ -1,0 +1,37 @@
+version: 2
+
+models:
+
+  - name: int_tipman_pickem__entries
+    description: >
+      Entry-grain model aggregated from selection-grain source. One row per user per contest.
+      Derives entry_id as surrogate key on (user_id, contest_id). Adds tenant_id from
+      contests and tiebreaker_outcome from questions.
+    columns:
+      - name: entry_id
+        tests:
+          - unique
+          - not_null
+      - name: user_id
+        tests:
+          - not_null
+      - name: contest_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_tipman_pickem__contests')
+              field: contest_id
+      - name: client_id
+        tests:
+          - not_null
+      - name: tenant_id
+        tests:
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['pickem']
+      - name: entered_at
+        tests:
+          - not_null
