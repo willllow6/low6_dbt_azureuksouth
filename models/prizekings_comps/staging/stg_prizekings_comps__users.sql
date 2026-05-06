@@ -15,8 +15,9 @@ renamed as (
         id as user_id,
         tenant_id,
 
-
         ---------- strings
+        'prizekings' as client_id,
+        'prize_competition' as game_type,
         first_name,
         last_name,
         email,

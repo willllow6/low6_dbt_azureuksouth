@@ -2,30 +2,49 @@ version: 2
 
 models:
 
-  - name: int_prizekings_comps__competitions_unioned
+  - name: int_prizekings_comps__contests_unioned
     columns:
-      - name: competition_sk
+      - name: contest_sk
         tests:
           - unique
           - not_null
       - name: tenant_id
         tests:
           - not_null
-      - name: competition_type
+      - name: client_id
+        tests:
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['prize_competition']
+      - name: contest_type
         tests:
           - not_null
           - accepted_values:
               values: ['spot_the_ball', 'draw']
 
-  - name: int_prizekings_comps__competition_entries_unioned
+  - name: int_prizekings_comps__entries_unioned
     columns:
       - name: entry_sk
         tests:
           - unique
           - not_null
-      - name: competition_sk
+      - name: contest_sk
         tests:
           - not_null
       - name: user_id
         tests:
           - not_null
+      - name: tenant_id
+        tests:
+          - not_null
+      - name: client_id
+        tests:
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['prize_competition']

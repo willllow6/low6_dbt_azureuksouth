@@ -14,10 +14,12 @@ renamed as (
         ----------  ids
         id as prize_id,
         'DRAW_' || id as prize_sk,
-        raffle_id as competition_id,
-        'DRAW_' || competition_id as competition_sk,
+        raffle_id as contest_id,
+        'DRAW_' || raffle_id as contest_sk,
 
         ---------- strings
+        'prizekings' as client_id,
+        'prize_competition' as game_type,
         prize_type,
 
         ---------- numerics

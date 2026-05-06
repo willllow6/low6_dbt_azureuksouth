@@ -7,25 +7,28 @@ deposits as (
 
 ),
 
-users as (
+tenants as (
 
     select *
-    from {{ ref('dim_prizekings_comps__users') }}
+    from {{ ref('dim_prizekings_comps__tenants') }}
 
 ),
 
 deposit_metrics as (
 
     select
-        cast(deposits.payment_processed_at as date) as deposit_date,
-        users.tenant_id,
+        cast(deposits.payment_processed_at as date) as date_day,
+        deposits.client_id,
+        deposits.tenant_id,
+        t.tenant_name,
+        deposits.game_type,
         count(*) as total_deposits,
         sum(case when user_deposit_number = 1 then 1 else 0 end) as first_time_depositors,
         sum(amount) as total_deposit_amount
     from deposits
-    inner join users
-        on deposits.user_id = users.user_id
-    group by 1,2
+    inner join tenants as t
+        on deposits.tenant_id = t.tenant_id
+    group by 1, 2, 3, 4, 5
 
 )
 

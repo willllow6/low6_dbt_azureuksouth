@@ -16,23 +16,30 @@ renamed as (
         language_id,
         raffle_id,
         prize_id,
+        case
+            when prize_id is not null
+                then 'DRAW_' || prize_id
+            else null
+        end as prize_sk,
         promotion_id,
         blog_id,
         category_id,
-        competition_id,
-        case 
+        competition_id as contest_id,
+        case
             when competition_id is not null
-                then  'STB_' || competition_id
+                then 'STB_' || competition_id
             when raffle_id is not null
                 then 'DRAW_' || raffle_id
             else null
-        end as competition_sk,
+        end as contest_sk,
 
         ---------- strings
+        'prizekings' as client_id,
+        'prize_competition' as game_type,
         data_type,
         data as data_json,
         data:name::string as translation_name,
-        data:desc::string as translation_description,
+        data:description::string as translation_description,
 
         ---------- numerics
 

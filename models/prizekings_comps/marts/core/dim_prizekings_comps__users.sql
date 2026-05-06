@@ -10,6 +10,8 @@ users as (
 select
     user_id,
     tenant_id,
+    client_id,
+    game_type,
     first_name,
     last_name,
     email,

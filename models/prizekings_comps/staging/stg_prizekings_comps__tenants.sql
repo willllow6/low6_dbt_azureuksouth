@@ -16,6 +16,8 @@ renamed as (
         default_language_id,
 
         ---------- strings
+        'prizekings' as client_id,
+        'prize_competition' as game_type,
         name as tenant_name,
         code as tenant_code,
 

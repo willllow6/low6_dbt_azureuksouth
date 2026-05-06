@@ -15,6 +15,8 @@ renamed as (
         id as language_id,
 
         ---------- strings
+        'prizekings' as client_id,
+        'prize_competition' as game_type,
         name as language_name,
         code as language_code,
 

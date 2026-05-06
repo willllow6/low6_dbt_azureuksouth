@@ -16,6 +16,8 @@ promotion_tenants as (
 
 select
     promotions.promotion_id,
+    promotions.client_id,
+    promotions.game_type,
     promotion_tenants.tenant_id,
     promotions.promotion_type,
     promotions.bonus_type,

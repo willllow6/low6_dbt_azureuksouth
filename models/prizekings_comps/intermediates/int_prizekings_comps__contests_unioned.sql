@@ -17,25 +17,31 @@ draw_comps as (
 unioned as (
 
     select
-        competition_sk,
+        contest_sk,
         tenant_id,
-        competition_type,
-        competition_status,
-        entry_price,
+        client_id,
+        game_type,
+        contest_type,
+        contest_status,
+        is_active,
+        entry_fee,
         starts_at,
         ends_at,
         created_at,
         updated_at
     from stb_comps
 
-    union all 
+    union all
 
     select
-        competition_sk,
+        contest_sk,
         tenant_id,
-        competition_type,
-        competition_status,
-        entry_price,
+        client_id,
+        game_type,
+        contest_type,
+        contest_status,
+        is_active,
+        entry_fee,
         starts_at,
         ends_at,
         created_at,

@@ -15,6 +15,8 @@ renamed as (
         id as promotion_id,
 
         ---------- strings
+        'prizekings' as client_id,
+        'prize_competition' as game_type,
         promotion_type,
         reward_type as bonus_type,
 

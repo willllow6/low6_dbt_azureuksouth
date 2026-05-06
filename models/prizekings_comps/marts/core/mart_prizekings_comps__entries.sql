@@ -3,14 +3,14 @@ with
 entries as (
 
     select *
-    from {{ ref('fct_prizekings_comps__competition_entries') }}
+    from {{ ref('fct_prizekings_comps__entries') }}
 
 ),
 
-competitions as (
+contests as (
 
     select *
-    from {{ ref('dim_prizekings_comps__competitions') }}
+    from {{ ref('dim_prizekings_comps__contests') }}
 
 ),
 
@@ -30,25 +30,30 @@ tenants as (
 
 select
     e.entry_sk,
-    e.competition_sk,
+    e.contest_sk,
     e.user_id,
+    e.client_id,
+    e.game_type,
+    e.tenant_id,
+    t.tenant_name,
     e.prize_sk,
     e.is_winner,
     e.user_entry_number,
-    c.competition_name,
-    c.competition_type,
-    c.competition_status,
-    c.entry_price,
+    c.contest_name,
+    c.contest_type,
+    c.contest_status,
+    c.entry_fee,
     c.starts_at,
     c.ends_at,
     p.prize_type,
+    p.prize_name,
     p.value as prize_value,
-    t.tenant_name,
+    e.entered_at,
     e.created_at
 from entries as e
-inner join competitions as c
-    on e.competition_sk = c.competition_sk
+inner join contests as c
+    on e.contest_sk = c.contest_sk
 left join prizes as p
     on e.prize_sk = p.prize_sk
 left join tenants as t
-    on c.tenant_id = t.tenant_id
+    on e.tenant_id = t.tenant_id

@@ -2,16 +2,24 @@ version: 2
 
 models:
 
-  - name: dim_prizekings_comps__competitions
+  - name: dim_prizekings_comps__contests
     columns:
-      - name: competition_sk
+      - name: contest_sk
         tests:
           - unique
           - not_null
       - name: tenant_id
         tests:
           - not_null
-      - name: competition_type
+      - name: client_id
+        tests:
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['prize_competition']
+      - name: contest_type
         tests:
           - not_null
           - accepted_values:
@@ -23,9 +31,22 @@ models:
         tests:
           - unique
           - not_null
-      - name: competition_sk
+      - name: contest_sk
         tests:
           - not_null
+      - name: client_id
+        tests:
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['prize_competition']
+      - name: prize_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['main', 'second', 'instant']
 
   - name: dim_prizekings_comps__users
     columns:
@@ -36,6 +57,14 @@ models:
       - name: tenant_id
         tests:
           - not_null
+      - name: client_id
+        tests:
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['prize_competition']
 
   - name: dim_prizekings_comps__tenants
     columns:
@@ -43,28 +72,73 @@ models:
         tests:
           - unique
           - not_null
+      - name: client_id
+        tests:
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['prize_competition']
 
   - name: dim_prizekings_comps__promotions
     columns:
       - name: promotion_id
         tests:
           - not_null
+      - name: client_id
+        tests:
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['prize_competition']
 
-  - name: fct_prizekings_comps__competition_entries
+  - name: fct_prizekings_comps__entries
     columns:
       - name: entry_sk
         tests:
           - unique
           - not_null
-      - name: competition_sk
+      - name: contest_sk
         tests:
           - not_null
           - relationships:
-              to: ref('dim_prizekings_comps__competitions')
-              field: competition_sk
+              to: ref('dim_prizekings_comps__contests')
+              field: contest_sk
       - name: user_id
         tests:
           - not_null
+      - name: tenant_id
+        tests:
+          - not_null
+      - name: client_id
+        tests:
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['prize_competition']
+
+  - name: agg_prizekings_comps__contest_financials
+    columns:
+      - name: contest_sk
+        tests:
+          - unique
+          - not_null
+      - name: tenant_id
+        tests:
+          - not_null
+      - name: client_id
+        tests:
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['prize_competition']
 
   - name: fct_prizekings_comps__deposits
     columns:
@@ -75,19 +149,40 @@ models:
       - name: user_id
         tests:
           - not_null
+      - name: client_id
+        tests:
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['prize_competition']
 
   - name: fct_prizekings_comps__prize_awards
     columns:
-      - name: entry_sk
+      - name: prize_award_id
         tests:
           - unique
           - not_null
-      - name: competition_sk
+      - name: contest_sk
         tests:
           - not_null
       - name: user_id
         tests:
           - not_null
+      - name: client_id
+        tests:
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['prize_competition']
+      - name: prize_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['main', 'second', 'instant']
 
   - name: fct_prizekings_comps__user_promotions
     columns:
@@ -102,15 +197,220 @@ models:
         tests:
           - not_null
 
-  - name: mart_prizekings_comps__competition_entries
+  - name: mart_prizekings_comps__entries
     columns:
       - name: entry_sk
         tests:
           - unique
           - not_null
-      - name: competition_sk
+      - name: contest_sk
         tests:
           - not_null
       - name: user_id
         tests:
           - not_null
+      - name: tenant_id
+        tests:
+          - not_null
+      - name: client_id
+        tests:
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['prize_competition']
+
+  - name: agg_prizekings_comps__registration_metrics_daily
+    columns:
+      - name: date_day
+        tests:
+          - not_null
+      - name: client_id
+        tests:
+          - not_null
+      - name: tenant_id
+        tests:
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['prize_competition']
+
+  - name: agg_prizekings_comps__user_activity_daily
+    columns:
+      - name: date_day
+        tests:
+          - not_null
+      - name: client_id
+        tests:
+          - not_null
+      - name: tenant_id
+        tests:
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['prize_competition']
+
+  - name: agg_prizekings_comps__entry_metrics_daily
+    columns:
+      - name: date_day
+        tests:
+          - not_null
+      - name: client_id
+        tests:
+          - not_null
+      - name: tenant_id
+        tests:
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['prize_competition']
+
+  - name: agg_prizekings_comps__contest_metrics_daily
+    columns:
+      - name: date_day
+        tests:
+          - not_null
+      - name: client_id
+        tests:
+          - not_null
+      - name: tenant_id
+        tests:
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['prize_competition']
+
+  - name: agg_prizekings_comps__financial_metrics_daily
+    columns:
+      - name: date_day
+        tests:
+          - not_null
+      - name: client_id
+        tests:
+          - not_null
+      - name: tenant_id
+        tests:
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['prize_competition']
+
+  - name: agg_prizekings_comps__entry_financial_metrics_daily
+    columns:
+      - name: date_day
+        tests:
+          - not_null
+      - name: client_id
+        tests:
+          - not_null
+      - name: tenant_id
+        tests:
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['prize_competition']
+
+  - name: agg_prizekings_comps__deposit_metrics_daily
+    columns:
+      # - name: date_day
+      #   tests:
+      #     - not_null
+      - name: client_id
+        tests:
+          - not_null
+      - name: tenant_id
+        tests:
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['prize_competition']
+
+  - name: agg_prizekings_comps__prize_awards_daily
+    columns:
+      - name: date_day
+        tests:
+          - not_null
+      - name: client_id
+        tests:
+          - not_null
+      - name: tenant_id
+        tests:
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['prize_competition']
+
+  - name: agg_prizekings_comps__bonus_metrics_daily
+    columns:
+      - name: date_day
+        tests:
+          - not_null
+      - name: tenant_id
+        tests:
+          - not_null
+
+  - name: agg_prizekings_comps__conversion_funnel_daily
+    columns:
+      - name: date_day
+        tests:
+          - not_null
+      - name: client_id
+        tests:
+          - not_null
+      - name: tenant_id
+        tests:
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['prize_competition']
+
+  - name: agg_prizekings_comps__cohort_retention_weekly
+    columns:
+      - name: cohort_week
+        tests:
+          - not_null
+      - name: client_id
+        tests:
+          - not_null
+      - name: tenant_id
+        tests:
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['prize_competition']
+
+  - name: agg_prizekings_comps__contest_performance
+    columns:
+      - name: contest_sk
+        tests:
+          - unique
+          - not_null
+      - name: client_id
+        tests:
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['prize_competition']

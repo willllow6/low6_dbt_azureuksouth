@@ -1,39 +1,36 @@
 with
 
-transactions as (
+entry_financials as (
 
     select *
-    from {{ ref('stg_prizekings_comps__transactions') }}
-    where competition_sk is not null
+    from {{ ref('agg_prizekings_comps__entry_financial_metrics_daily') }}
 
 ),
 
-users as (
+prize_awards as (
 
     select *
-    from {{ ref('dim_prizekings_comps__users') }}
+    from {{ ref('agg_prizekings_comps__prize_awards_daily') }}
 
 ),
 
-base as (
+joined as (
 
     select
-        cast(transactions.created_at as date) as transaction_date,
-        users.tenant_id,
-        sum(case when transaction_direction = 'outgoing' then amount else 0 end) as gross_entry_revenue,
-        sum(case when transaction_direction = 'outgoing' and balance_type = 'deposit' then amount else 0 end) as cash_entry_revenue,
-        sum(case when transaction_direction = 'outgoing' and balance_type = 'site_credit' then amount else 0 end) as credit_entry_spend,
-        sum(case when transaction_direction = 'incoming' then amount else 0 end) as total_prize_value_awarded,
-        sum(case when transaction_direction = 'incoming' and balance_type = 'deposit' then amount else 0 end) as cash_prize_value_awarded,
-        sum(case when transaction_direction = 'incoming' and balance_type = 'site_credit' then amount else 0 end) as credit_prize_value_awarded
-    from transactions
-    left join users
-        on transactions.user_id = users.user_id
-    group by 1,2
+        coalesce(ef.date_day, pa.date_day) as date_day,
+        coalesce(ef.client_id, pa.client_id) as client_id,
+        coalesce(ef.tenant_id, pa.tenant_id) as tenant_id,
+        coalesce(ef.tenant_name, pa.tenant_name) as tenant_name,
+        coalesce(ef.game_type, pa.game_type) as game_type,
+        'GBP' as currency,
+        coalesce(ef.gross_entry_revenue, 0) as gross_revenue,
+        coalesce(pa.gross_prize_value, 0) as gross_prizes,
+        coalesce(ef.gross_entry_revenue, 0) - coalesce(pa.gross_prize_value, 0) as gross_profit
+    from entry_financials as ef
+    full outer join prize_awards as pa
+        on ef.date_day = pa.date_day
+        and ef.tenant_id = pa.tenant_id
 
 )
 
-select
-    *,
-    cash_entry_revenue - cash_prize_value_awarded as gross_profit
-from base
+select * from joined

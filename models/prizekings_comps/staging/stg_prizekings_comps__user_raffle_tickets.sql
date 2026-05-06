@@ -14,8 +14,8 @@ renamed as (
         ----------  ids
         id as entry_id,
         'DRAW_' || id as entry_sk,
-        raffle_id as competition_id,
-        'DRAW_' || raffle_id as competition_sk,
+        raffle_id as contest_id,
+        'DRAW_' || raffle_id as contest_sk,
         transaction_id,
         user_id,
         prize_id,
@@ -26,17 +26,21 @@ renamed as (
         end as prize_sk,
 
         ---------- strings
+        'prizekings' as client_id,
+        'prize_competition' as game_type,
         ticket,
 
         ---------- numerics
-    
+
         ---------- booleans
         is_winner,
 
         ---------- dates
 
         ---------- timestamps
-        created_at
+        created_at as entered_at,
+        created_at,
+        updated_at
 
     from source
 

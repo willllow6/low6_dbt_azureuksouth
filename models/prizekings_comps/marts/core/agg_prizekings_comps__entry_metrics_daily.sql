@@ -3,29 +3,24 @@ with
 entries as (
 
     select *
-    from {{ ref('fct_prizekings_comps__competition_entries') }}
-
-),
-
-competitions as (
-
-    select *
-    from {{ ref('dim_prizekings_comps__competitions') }}
+    from {{ ref('mart_prizekings_comps__entries') }}
 
 ),
 
 entry_metrics as (
 
     select
-        cast(entries.created_at as date) as entry_date,
-        competitions.tenant_id,
+        cast(entries.entered_at as date) as date_day,
+        entries.client_id,
+        entries.tenant_id,
+        entries.tenant_name,
+        entries.game_type,
+        count(distinct entries.contest_sk) as contests_active,
         count(*) as total_entries,
-        sum(case when user_entry_number = 1 then 1 else 0 end) as first_user_entries,
-        sum(case when entries.is_winner then 1 else 0 end ) as total_winning_entries
+        count(distinct entries.user_id) as unique_entrants,
+        sum(case when entries.user_entry_number = 1 then 1 else 0 end) as first_time_entrants
     from entries
-    inner join competitions
-        on entries.competition_sk = competitions.competition_sk
-    group by 1,2
+    group by 1, 2, 3, 4, 5
 
 )
 
