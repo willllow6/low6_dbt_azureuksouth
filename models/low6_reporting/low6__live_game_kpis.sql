@@ -123,6 +123,26 @@ sevendays_dz as (
 
 ),
 
+sevendays_ad as (
+
+    select
+        '7dad' as app_id,
+        count(*) as entries,
+        sum(case when session_date = current_date() - 1 then 1 else 0 end) as yesterday_entries,
+        sum(case when session_date >= current_date() - 8 and session_date < current_date() then 1 else 0 end) as last_7_days_entries,
+        sum(case when session_date >= current_date() - 29 and session_date < current_date() then 1 else 0 end) as last_28_days_entries,
+        count(distinct user_id) as entrants,
+        count(distinct case when session_date = current_date() - 1 then user_id else null end) as yesterday_entrants,
+        count(distinct case when session_date >= current_date() - 8 and session_date < current_date() then user_id else null end) as last_7_days_entrants,
+        count(distinct case when session_date >= current_date() - 29 and session_date < current_date() then user_id else null end) as last_28_days_entrants,
+        count(distinct game_id) as contests,
+        max(cast(session_date as date)) as last_entry_date
+    from {{ ref('mart_seven_days__entries') }}
+    where game_name = 'Alien Dash'
+    group by 1
+
+),
+
 tipman_pickem as (
 
     select
@@ -172,6 +192,11 @@ union all
 
 select *
 from sevendays_dz
+
+union all
+
+select *
+from sevendays_ad
 
 union all
 
