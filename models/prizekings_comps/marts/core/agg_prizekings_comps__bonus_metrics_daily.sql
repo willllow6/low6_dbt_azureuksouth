@@ -5,7 +5,7 @@ transactions as (
     select *
     from {{ ref('stg_prizekings_comps__transactions') }}
     where transaction_direction = 'incoming'
-        and transaction_source in ('deposit_bonus', 'welcome_bonus', 'deposit_match', 'referral_bonus')
+        and transaction_source in ('deposit_bonus', 'welcome_bonus', 'registration_bonus', 'deposit_match', 'referral_bonus')
 
 ),
 
@@ -49,8 +49,8 @@ transaction_bonus_metrics as (
         transactions.game_type,
         count(case when transactions.transaction_source = 'deposit_bonus' then 1 end) as deposit_bonuses,
         sum(case when transactions.transaction_source = 'deposit_bonus' then transactions.amount else 0 end) as deposit_bonus_value,
-        count(case when transactions.transaction_source = 'welcome_bonus' then 1 end) as welcome_bonuses,
-        sum(case when transactions.transaction_source = 'welcome_bonus' then transactions.amount else 0 end) as welcome_bonus_value,
+        count(case when transactions.transaction_source in ('welcome_bonus', 'registration_bonus') then 1 end) as welcome_bonuses,
+        sum(case when transactions.transaction_source in ('welcome_bonus', 'registration_bonus') then transactions.amount else 0 end) as welcome_bonus_value,
         count(case when transactions.transaction_source = 'deposit_match' then 1 end) as deposit_matches,
         sum(case when transactions.transaction_source = 'deposit_match' then transactions.amount else 0 end) as deposit_match_value,
         count(case when transactions.transaction_source = 'referral_bonus' then 1 end) as referral_bonuses,

@@ -59,7 +59,7 @@ with_rank as (
 
     select
         *,
-        row_number() over (partition by user_id order by payment_processed_at) as user_deposit_number
+        row_number() over (partition by user_id order by transaction_created_at) as user_deposit_number
     from joined
 
 )

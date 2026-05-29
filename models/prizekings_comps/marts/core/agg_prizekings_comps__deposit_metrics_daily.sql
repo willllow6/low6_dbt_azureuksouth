@@ -17,7 +17,7 @@ tenants as (
 deposit_metrics as (
 
     select
-        cast(deposits.payment_processed_at as date) as date_day,
+        cast(deposits.transaction_created_at as date) as date_day,
         deposits.client_id,
         deposits.tenant_id,
         t.tenant_name,

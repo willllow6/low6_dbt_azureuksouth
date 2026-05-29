@@ -12,6 +12,7 @@ meta as (
     select
         *,
         metadata:competitionId::integer                        as _competition_id,
+        metadata:arcadeCompetitionId::integer                  as _arcade_competition_id,
         metadata:prizeId::string                               as _prize_id,
         metadata:source::string                                as _source,
         metadata:ticketId                                      as _ticket_id,
@@ -36,8 +37,13 @@ renamed as (
         raffle_id,
         promotion_id,
         user_promotion_id,
-        _competition_id as contest_id,
         case
+            when _source = 'arcade_entry_balance' then _arcade_competition_id
+            else _competition_id
+        end as contest_id,
+        case
+            when _source = 'arcade_entry_balance' and _arcade_competition_id is not null
+                then 'ARC_' || _arcade_competition_id
             when raffle_id is not null
                 then 'DRAW_' || raffle_id
             when _competition_id is not null
@@ -46,6 +52,7 @@ renamed as (
         end as contest_sk,
         _prize_id as prize_id,
         case
+            when _source = 'arcade_entry_balance' then null
             when raffle_id is not null
                 then 'DRAW_' || _prize_id
             when _competition_id is not null
@@ -53,6 +60,7 @@ renamed as (
             else null
         end as prize_sk,
         case
+            when _source = 'arcade_entry_balance' then null
             when raffle_id is not null
                 then 'DRAW_' || _ticket_id
             when _competition_id is not null
