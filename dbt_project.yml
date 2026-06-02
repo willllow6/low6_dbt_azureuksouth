@@ -32,6 +32,7 @@ clean-targets:         # directories to be removed by `dbt clean`
 vars:
   prizekings_start_date: '2026-02-11'
   tipman_start_date: '2026-04-24'  # TODO: confirm tipman go-live date
+  engagecraft_fantasy_start_date: '2026-05-22'
   local_timezone: 'Europe/London'
 
 models:
@@ -60,3 +61,7 @@ models:
     tipman_pickem:
       +schema: tipman_pickem
       +query_tag: tipman_pickem
+
+    engagecraft_fantasy:
+      +schema: engagecraft_fantasy
+      +query_tag: engagecraft_fantasy

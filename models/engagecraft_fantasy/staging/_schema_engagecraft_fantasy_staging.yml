@@ -1,0 +1,400 @@
+version: 2
+
+models:
+
+  - name: stg_engagecraft_fantasy__users
+    columns:
+      - name: user_id
+        tests:
+          - unique
+          - not_null
+      - name: client_id
+        tests:
+          - not_null
+      - name: tenant_id
+        tests:
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['fantasy']
+      - name: engagecraft_id
+        tests:
+          - not_null
+      - name: ref_id
+        tests:
+          - not_null
+
+  - name: stg_engagecraft_fantasy__tournaments
+    columns:
+      - name: tournament_id
+        tests:
+          - unique
+          - not_null
+      - name: client_id
+        tests:
+          - not_null
+      - name: tenant_id
+        tests:
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['fantasy']
+      - name: tournament_status
+        tests:
+          - not_null
+
+  - name: stg_engagecraft_fantasy__matchdays
+    columns:
+      - name: matchday_id
+        tests:
+          - unique
+          - not_null
+      - name: tournament_id
+        tests:
+          - not_null
+      - name: client_id
+        tests:
+          - not_null
+      - name: tenant_id
+        tests:
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['fantasy']
+      - name: matchday_status
+        tests:
+          - not_null
+      - name: matchday_number
+        tests:
+          - not_null
+
+  - name: stg_engagecraft_fantasy__teams
+    columns:
+      - name: team_id
+        tests:
+          - unique
+          - not_null
+      - name: client_id
+        tests:
+          - not_null
+      - name: tenant_id
+        tests:
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['fantasy']
+      - name: team_name
+        tests:
+          - not_null
+
+  - name: stg_engagecraft_fantasy__players
+    columns:
+      - name: player_id
+        tests:
+          - unique
+          - not_null
+      - name: client_id
+        tests:
+          - not_null
+      - name: tenant_id
+        tests:
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['fantasy']
+      - name: full_name
+        tests:
+          - not_null
+
+  - name: stg_engagecraft_fantasy__squad_memberships
+    columns:
+      - name: squad_membership_id
+        tests:
+          - unique
+          - not_null
+      - name: player_id
+        tests:
+          - not_null
+      - name: team_id
+        tests:
+          - not_null
+      - name: client_id
+        tests:
+          - not_null
+      - name: tenant_id
+        tests:
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['fantasy']
+
+  - name: stg_engagecraft_fantasy__fantasy_players
+    columns:
+      - name: fantasy_player_id
+        tests:
+          - unique
+          - not_null
+      - name: player_id
+        tests:
+          - not_null
+      - name: tournament_id
+        tests:
+          - not_null
+      - name: client_id
+        tests:
+          - not_null
+      - name: tenant_id
+        tests:
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['fantasy']
+      - name: fantasy_position
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['GK', 'DEF', 'MID', 'FWD']
+
+  - name: stg_engagecraft_fantasy__fantasy_teams
+    columns:
+      - name: fantasy_team_id
+        tests:
+          - unique
+          - not_null
+      - name: user_id
+        tests:
+          - not_null
+      - name: tournament_id
+        tests:
+          - not_null
+      - name: client_id
+        tests:
+          - not_null
+      - name: tenant_id
+        tests:
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['fantasy']
+      - name: team_name
+        tests:
+          - not_null
+
+  - name: stg_engagecraft_fantasy__selections
+    columns:
+      - name: selection_id
+        tests:
+          - unique
+          - not_null
+      - name: fantasy_team_id
+        tests:
+          - not_null
+      - name: fantasy_player_id
+        tests:
+          - not_null
+      - name: client_id
+        tests:
+          - not_null
+      - name: tenant_id
+        tests:
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['fantasy']
+
+  - name: stg_engagecraft_fantasy__fantasy_team_transfers
+    columns:
+      - name: transfer_id
+        tests:
+          - unique
+          - not_null
+      - name: fantasy_team_id
+        tests:
+          - not_null
+      - name: player_in_id
+        tests:
+          - not_null
+      - name: player_out_id
+        tests:
+          - not_null
+      - name: client_id
+        tests:
+          - not_null
+      - name: tenant_id
+        tests:
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['fantasy']
+      - name: transfer_status
+        tests:
+          - not_null
+
+  - name: stg_engagecraft_fantasy__player_matchday_scores
+    columns:
+      - name: player_matchday_id
+        tests:
+          - unique
+          - not_null
+      - name: fantasy_player_id
+        tests:
+          - not_null
+      - name: matchday_id
+        tests:
+          - not_null
+      - name: client_id
+        tests:
+          - not_null
+      - name: tenant_id
+        tests:
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['fantasy']
+
+  - name: stg_engagecraft_fantasy__team_matchday_snapshots
+    columns:
+      - name: snapshot_id
+        tests:
+          - unique
+          - not_null
+      - name: fantasy_team_id
+        tests:
+          - not_null
+      - name: matchday_id
+        tests:
+          - not_null
+      - name: client_id
+        tests:
+          - not_null
+      - name: tenant_id
+        tests:
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['fantasy']
+      - name: total_points
+        tests:
+          - not_null
+
+  - name: stg_engagecraft_fantasy__boosters
+    columns:
+      - name: booster_id
+        tests:
+          - unique
+          - not_null
+      - name: client_id
+        tests:
+          - not_null
+      - name: booster_code
+        tests:
+          - unique
+          - not_null
+      - name: booster_name
+        tests:
+          - not_null
+
+  - name: stg_engagecraft_fantasy__matchday_boosters
+    columns:
+      - name: matchday_booster_id
+        tests:
+          - unique
+          - not_null
+      - name: fantasy_team_id
+        tests:
+          - not_null
+      - name: matchday_id
+        tests:
+          - not_null
+      - name: booster_id
+        tests:
+          - not_null
+      - name: client_id
+        tests:
+          - not_null
+      - name: tenant_id
+        tests:
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['fantasy']
+
+  - name: stg_engagecraft_fantasy__leagues
+    columns:
+      - name: league_id
+        tests:
+          - unique
+          - not_null
+      - name: tournament_id
+        tests:
+          - not_null
+      - name: client_id
+        tests:
+          - not_null
+      - name: tenant_id
+        tests:
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['fantasy']
+      - name: league_name
+        tests:
+          - not_null
+      - name: league_type
+        tests:
+          - not_null
+
+  - name: stg_engagecraft_fantasy__league_entries
+    columns:
+      - name: league_entry_id
+        tests:
+          - unique
+          - not_null
+      - name: league_id
+        tests:
+          - not_null
+      - name: user_id
+        tests:
+          - not_null
+      - name: fantasy_team_id
+        tests:
+          - not_null
+      - name: client_id
+        tests:
+          - not_null
+      - name: tenant_id
+        tests:
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['fantasy']

@@ -1,0 +1,35 @@
+version: 2
+
+models:
+
+  - name: int_engagecraft_fantasy__players_enriched
+    columns:
+      - name: fantasy_player_id
+        tests:
+          - unique
+          - not_null
+      - name: player_id
+        tests:
+          - not_null
+      - name: tournament_id
+        tests:
+          - not_null
+      - name: client_id
+        tests:
+          - not_null
+      - name: tenant_id
+        tests:
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['fantasy']
+      - name: full_name
+        tests:
+          - not_null
+      - name: fantasy_position
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['GK', 'DEF', 'MID', 'FWD']
