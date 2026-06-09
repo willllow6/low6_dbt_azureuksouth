@@ -160,6 +160,25 @@ tipman_pickem as (
     from {{ ref('mart_tipman_pickem__entries') }}
     group by 1  
 
+),
+
+engagecraft_fantasy as (
+
+    select
+        'engsdt' as app_id,
+        count(*) as entries,
+        sum(case when created_at = current_date() - 1 then 1 else 0 end) as yesterday_entries,
+        sum(case when created_at >= current_date() - 8 and created_at < current_date() then 1 else 0 end) as last_7_days_entries,
+        sum(case when created_at >= current_date() - 29 and created_at < current_date() then 1 else 0 end) as last_28_days_entries,
+        count(distinct user_id) as entrants,
+        count(distinct case when created_at = current_date() - 1 then user_id else null end) as yesterday_entrants,
+        count(distinct case when created_at >= current_date() - 8 and created_at < current_date() then user_id else null end) as last_7_days_entrants,
+        count(distinct case when created_at >= current_date() - 29 and created_at < current_date() then user_id else null end) as last_28_days_entrants,
+        1 as contests,
+        max(cast(created_at as date)) as last_entry_date
+    from {{ ref('dim_engagecraft_fantasy__fantasy_teams') }}
+    group by 1  
+
 )
 
 
@@ -202,3 +221,8 @@ union all
 
 select *
 from tipman_pickem
+
+union all
+
+select *
+from engagecraft_fantasy
