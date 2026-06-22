@@ -12,7 +12,10 @@
       "Read(//c/Users/WillBreeden/.claude/**)",
       "Read(//c/Users/WillBreeden/low6_dbt_us/templates/picks_template/marts/agg/**)",
       "Read(//c/Users/WillBreeden//**)",
-      "Read(//c/Users/WillBreeden/**)"
+      "Read(//c/Users/WillBreeden/**)",
+      "mcp__dbt__compile",
+      "mcp__dbt__build",
+      "mcp__dbt__show"
     ],
     "additionalDirectories": [
       "C:\\Users\\WillBreeden\\low6_dbt_us\\models\\picks_template\\staging",

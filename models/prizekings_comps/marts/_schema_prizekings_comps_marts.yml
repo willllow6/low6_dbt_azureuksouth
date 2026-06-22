@@ -414,3 +414,46 @@ models:
           - not_null
           - accepted_values:
               values: ['prize_competition']
+
+  - name: mart_prizekings_comps__deposit_transactions
+    columns:
+      - name: transaction_id
+        tests:
+          - unique
+          - not_null
+      - name: user_id
+        tests:
+          - not_null
+      - name: client_id
+        tests:
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['prize_competition']
+
+  - name: mart_prizekings_comps__users
+    columns:
+      - name: user_id
+        tests:
+          - unique
+          - not_null
+      - name: client_id
+        tests:
+          - not_null
+      - name: tenant_id
+        tests:
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['prize_competition']
+
+  - name: shared_prizekings_comps__users
+    columns:
+      - name: user_id
+        tests:
+          - unique
+          - not_null
