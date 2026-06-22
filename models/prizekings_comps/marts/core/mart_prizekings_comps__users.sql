@@ -66,6 +66,18 @@ tenants as (
 
 ),
 
+user_affiliates as (
+
+    select
+        r.user_id,
+        a.affiliate_name
+    from {{ ref('stg_prizekings_comps__user_registration_attribution') }} as r
+    left join {{ ref('stg_prizekings_comps__affiliates') }} as a
+        on r.affiliate_id = a.affiliate_id
+    qualify row_number() over (partition by r.user_id order by r.attributed_at desc) = 1
+
+),
+
 user_balances as (
 
     select
@@ -98,6 +110,7 @@ final as (
         u.mobile,
         u.email,
         t.tenant_name,
+        ua.affiliate_name,
         coalesce(d.deposit_count, 0)        as deposit_count,
         coalesce(d.total_deposit_amount, 0) as total_deposit_amount,
         coalesce(e.total_entries, 0)        as total_entries,
@@ -119,6 +132,8 @@ final as (
         on u.user_id = b.user_id
     left join tenants as t
         on u.tenant_id = t.tenant_id
+    left join user_affiliates as ua
+        on u.user_id = ua.user_id
 
 )
 

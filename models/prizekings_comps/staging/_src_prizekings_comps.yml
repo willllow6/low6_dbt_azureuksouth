@@ -22,3 +22,8 @@ sources:
       - name: languages
       - name: translations
       - name: users
+      - name: affiliate
+      - name: campaign
+      - name: campaign_affiliate
+      - name: deposit_attribution
+      - name: user_registration_attribution

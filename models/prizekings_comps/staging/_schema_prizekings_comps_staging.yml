@@ -207,6 +207,62 @@ models:
           - accepted_values:
               values: ['main', 'second', 'instant']
 
+  - name: stg_prizekings_comps__affiliates
+    columns:
+      - name: affiliate_id
+        tests:
+          - unique
+          - not_null
+      - name: affiliate_name
+        tests:
+          - not_null
+      - name: affiliate_code
+        tests:
+          - unique
+          - not_null
+
+  - name: stg_prizekings_comps__campaigns
+    columns:
+      - name: campaign_id
+        tests:
+          - unique
+          - not_null
+
+  - name: stg_prizekings_comps__campaign_affiliates
+    columns:
+      - name: campaign_id
+        tests:
+          - not_null
+      - name: affiliate_id
+        tests:
+          - not_null
+
+  - name: stg_prizekings_comps__deposit_attribution
+    columns:
+      - name: attribution_id
+        tests:
+          - unique
+          - not_null
+      - name: transaction_id
+        tests:
+          - not_null
+      - name: user_id
+        tests:
+          - not_null
+
+  - name: stg_prizekings_comps__user_registration_attribution
+    columns:
+      - name: attribution_id
+        tests:
+          - unique
+          - not_null
+      - name: user_id
+        tests:
+          - not_null
+      - name: affiliate_id
+        tests:
+          - not_null
+
   - name: stg_prizekings_comps__prizes
     columns:
       - name: prize_sk

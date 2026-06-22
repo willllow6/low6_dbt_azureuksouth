@@ -33,7 +33,11 @@ vars:
   prizekings_start_date: '2026-02-11'
   tipman_start_date: '2026-04-24'  # TODO: confirm tipman go-live date
   engagecraft_fantasy_start_date: '2026-05-22'
+  oddschecker_spintowin_start_date: '2026-06-03'
   local_timezone: 'Europe/London'
+
+on-run-start:
+  - "{{ create_share('prizekings_share', ['KY17595']) }}"
 
 models:
   low6_dbt_azureuksouth:
@@ -65,3 +69,7 @@ models:
     engagecraft_fantasy:
       +schema: engagecraft_fantasy
       +query_tag: engagecraft_fantasy
+
+    oddschecker_spintowin:
+      +schema: oddschecker_spintowin
+      +query_tag: oddschecker_spintowin

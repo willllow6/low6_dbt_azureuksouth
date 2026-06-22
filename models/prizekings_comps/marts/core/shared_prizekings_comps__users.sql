@@ -16,6 +16,7 @@ users as (
 select
     user_id,
     tenant_name,
+    affiliate_name,
     first_name,
     mobile,
     deposit_count,
