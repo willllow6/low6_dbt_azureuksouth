@@ -22,7 +22,7 @@ meta as (
         metadata:ticketsType                                   as _tickets_type,
         metadata:paidEntries::integer                          as _paid_entries,
         metadata:freeEntries::integer                          as _free_entries,
-        metadata:externalPaymentData.paymentDate::timestamp_tz as _payment_date
+        metadata:externalPaymentData.paymentDate::timestamp_ntz as _payment_date
     from source
 
 ),
@@ -120,9 +120,9 @@ renamed as (
         ---------- dates
 
         ---------- timestamps
-        _payment_date as payment_processed_at,
-        created_at,
-        updated_at
+        _payment_date as payment_processed_at_local,
+        created_at::timestamp_ntz as created_at,
+        updated_at::timestamp_ntz as updated_at
 
     from meta
 

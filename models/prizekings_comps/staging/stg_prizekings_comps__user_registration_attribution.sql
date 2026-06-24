@@ -23,8 +23,8 @@ renamed as (
         attribution_source,
 
         ---------- timestamps
-        attributed_at,
-        created_at
+        attributed_at::timestamp_ntz as attributed_at,
+        created_at::timestamp_ntz as created_at
 
     from source
 

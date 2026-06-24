@@ -37,11 +37,11 @@ renamed as (
         ---------- dates
 
         ---------- timestamps
-        start_date as starts_at,
-        end_date as ends_at,
-        created_at,
-        updated_at,
-        deleted_at
+        start_date::timestamp_ntz as starts_at,
+        end_date::timestamp_ntz as ends_at,
+        created_at::timestamp_ntz as created_at,
+        updated_at::timestamp_ntz as updated_at,
+        deleted_at::timestamp_ntz as deleted_at
 
     from source
 

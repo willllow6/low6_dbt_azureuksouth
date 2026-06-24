@@ -12,7 +12,7 @@ deposits as (
         payment_reference,
         amount,
         meta_data_json,
-        payment_processed_at,
+        payment_processed_at_local,
         created_at  as transaction_created_at,
         updated_at  as transaction_updated_at,
         row_number() over (partition by user_id order by created_at) as user_deposit_number
@@ -83,7 +83,7 @@ final as (
         d.meta_data_json:externalPaymentData:transactionId::string   as provider_transaction_id,
 
         ---------- timestamps
-        d.payment_processed_at,
+        d.payment_processed_at_local,
         d.transaction_created_at,
         d.transaction_updated_at
 

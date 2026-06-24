@@ -17,7 +17,7 @@ tenants as (
 registration_metrics as (
 
     select
-        cast(u.created_at as date) as date_day,
+        cast(convert_timezone('UTC', '{{ var("local_timezone") }}', u.created_at) as date) as date_day,
         u.client_id,
         u.tenant_id,
         t.tenant_name,

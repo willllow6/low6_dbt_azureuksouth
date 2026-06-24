@@ -31,10 +31,10 @@ renamed as (
         is_within_window,
 
         ---------- timestamps
-        attributed_at,
-        overridden_at,
-        created_at,
-        updated_at
+        attributed_at::timestamp_ntz as attributed_at,
+        overridden_at::timestamp_ntz as overridden_at,
+        created_at::timestamp_ntz as created_at,
+        updated_at::timestamp_ntz as updated_at
 
     from source
 

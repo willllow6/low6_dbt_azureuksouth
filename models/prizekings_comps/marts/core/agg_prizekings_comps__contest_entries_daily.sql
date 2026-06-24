@@ -10,7 +10,7 @@ entries as (
 daily_entries as (
 
     select
-        cast(entered_at as date) as date_day,
+        cast(convert_timezone('UTC', '{{ var("local_timezone") }}', entered_at) as date) as date_day,
         client_id,
         tenant_id,
         tenant_name,

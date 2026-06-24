@@ -12,7 +12,7 @@ deposits as (
         payment_reference,
         amount,
         meta_data_json,
-        payment_processed_at,
+        payment_processed_at_local,
         created_at as transaction_created_at,
         updated_at as transaction_updated_at
     from {{ ref('stg_prizekings_comps__transactions') }}
@@ -20,7 +20,7 @@ deposits as (
     and transaction_direction = 'incoming'
     and balance_type = 'deposit'
     and transaction_status = 'completed'
-    -- and payment_processed_at is not null
+    -- and payment_processed_at_local is not null
 
 ),
 
@@ -46,7 +46,7 @@ joined as (
         d.payment_reference,
         d.amount,
         d.meta_data_json,
-        d.payment_processed_at,
+        d.payment_processed_at_local,
         d.transaction_created_at,
         d.transaction_updated_at
     from deposits as d

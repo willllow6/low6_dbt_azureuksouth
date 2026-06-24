@@ -41,10 +41,10 @@ renamed as (
         ---------- dates
 
         ---------- timestamps
-        created_at as entered_at,
-        created_at,
-        updated_at,
-        deleted_at
+        created_at::timestamp_ntz as entered_at,
+        created_at::timestamp_ntz as created_at,
+        updated_at::timestamp_ntz as updated_at,
+        deleted_at::timestamp_ntz as deleted_at
 
     from source
 

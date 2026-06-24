@@ -27,7 +27,7 @@ renamed as (
         ---------- dates
 
         ---------- timestamps
-        created_at
+        created_at::timestamp_ntz as created_at
 
     from source
 

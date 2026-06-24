@@ -31,8 +31,8 @@ select
     site_code,
     provider_transaction_id,
     provider_status_message,
-    user_deposit_number,
-    payment_processed_at,
+    -- user_deposit_number,
+    payment_processed_at_local,
     transaction_created_at,
     transaction_updated_at
 from deposit_transactions

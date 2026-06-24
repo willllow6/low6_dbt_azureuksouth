@@ -35,8 +35,8 @@ renamed as (
         ---------- dates
 
         ---------- timestamps
-        completed_at,
-        created_at
+        completed_at::timestamp_ntz as completed_at,
+        created_at::timestamp_ntz as created_at
 
     from source
 

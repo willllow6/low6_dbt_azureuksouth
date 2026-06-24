@@ -10,7 +10,7 @@ registrations as (
 daily_registrations as (
 
     select
-        cast(created_at as date) as date_day,
+        cast(convert_timezone('UTC', '{{ var("local_timezone") }}', created_at) as date) as date_day,
         client_id,
         game_type,
         tenant_name,

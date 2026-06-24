@@ -35,7 +35,7 @@ user_entry_summary as (
 daily_registrations as (
 
     select
-        cast(u.created_at as date) as date_day,
+        cast(convert_timezone('UTC', '{{ var("local_timezone") }}', u.created_at) as date) as date_day,
         u.client_id,
         u.tenant_id,
         t.tenant_name,
@@ -51,7 +51,7 @@ daily_registrations as (
 daily_activations as (
 
     select
-        cast(u.created_at as date) as date_day,
+        cast(convert_timezone('UTC', '{{ var("local_timezone") }}', u.created_at) as date) as date_day,
         u.client_id,
         u.tenant_id,
         t.tenant_name,

@@ -25,7 +25,7 @@ tenants as (
 base as (
 
     select
-        cast(transactions.created_at as date) as date_day,
+        cast(convert_timezone('UTC', '{{ var("local_timezone") }}', transactions.created_at) as date) as date_day,
         transactions.client_id,
         contests.tenant_id,
         t.tenant_name,

@@ -24,7 +24,7 @@ entries as (
 contest_activity as (
 
     select
-        cast(e.entered_at as date) as date_day,
+        cast(convert_timezone('UTC', '{{ var("local_timezone") }}', e.entered_at) as date) as date_day,
         c.client_id,
         c.tenant_id,
         t.tenant_name,
