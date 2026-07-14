@@ -1,0 +1,13 @@
+version: 2
+
+sources:
+
+  - name: oddschecker_spintowin
+    description: Oddschecker spin-to-win instant win game database
+    database: low6_azureuksouth
+    schema: adfoddscheckerspintowin
+    tables:
+
+      - name: users
+      - name: activities
+      - name: prize_tiers

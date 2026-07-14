@@ -1,0 +1,289 @@
+version: 2
+
+models:
+
+  - name: dim_oddschecker_spintowin__users
+    columns:
+      - name: user_id
+        tests:
+          - unique
+          - not_null
+      - name: external_user_id
+        tests:
+          - not_null
+      - name: client_id
+        tests:
+          - not_null
+      - name: tenant_id
+        tests:
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['instant_win']
+
+  - name: dim_oddschecker_spintowin__prize_tiers
+    columns:
+      - name: prize_tier_id
+        tests:
+          - unique
+          - not_null
+      - name: client_id
+        tests:
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['instant_win']
+      - name: prize_tier_name
+        tests:
+          - not_null
+
+  - name: fct_oddschecker_spintowin__registrations
+    columns:
+      - name: user_id
+        tests:
+          - unique
+          - not_null
+      - name: external_user_id
+        tests:
+          - not_null
+      - name: client_id
+        tests:
+          - not_null
+      - name: tenant_id
+        tests:
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['instant_win']
+      - name: registration_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['sso']
+      - name: registered_at
+        tests:
+          - not_null
+
+  - name: fct_oddschecker_spintowin__spins
+    columns:
+      - name: activity_id
+        tests:
+          - unique
+          - not_null
+      - name: user_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_oddschecker_spintowin__users')
+              field: user_id
+      - name: client_id
+        tests:
+          - not_null
+      - name: tenant_id
+        tests:
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['instant_win']
+      - name: prize_type
+        tests:
+          - accepted_values:
+              values: ['voucher', 'oc_plus']
+              where: "is_winner = true"
+      - name: spun_at
+        tests:
+          - not_null
+
+  - name: fct_oddschecker_spintowin__prize_awards
+    columns:
+      - name: activity_id
+        tests:
+          - unique
+          - not_null
+      - name: user_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_oddschecker_spintowin__users')
+              field: user_id
+      - name: client_id
+        tests:
+          - not_null
+      - name: tenant_id
+        tests:
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['instant_win']
+      - name: prize_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['voucher', 'oc_plus']
+      - name: prize_name
+        tests:
+          - not_null
+      - name: status
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['awarded', 'claimed']
+      - name: awarded_at
+        tests:
+          - not_null
+
+  - name: mart_oddschecker_spintowin__prize_awards
+    columns:
+      - name: activity_id
+        tests:
+          - unique
+          - not_null
+      - name: user_id
+        tests:
+          - not_null
+      - name: client_id
+        tests:
+          - not_null
+      - name: tenant_id
+        tests:
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['instant_win']
+      - name: prize_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['voucher', 'oc_plus']
+      - name: status
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['awarded', 'claimed']
+
+  - name: mart_oddschecker_spintowin__spins
+    columns:
+      - name: activity_id
+        tests:
+          - unique
+          - not_null
+      - name: user_id
+        tests:
+          - not_null
+      - name: client_id
+        tests:
+          - not_null
+      - name: tenant_id
+        tests:
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['instant_win']
+
+  - name: mart_oddschecker_spintowin__user_active_days
+    columns:
+      - name: user_id
+        tests:
+          - not_null
+      - name: date_day
+        tests:
+          - not_null
+      - name: client_id
+        tests:
+          - not_null
+      - name: tenant_id
+        tests:
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['instant_win']
+      - name: spins
+        tests:
+          - not_null
+
+  - name: agg_oddschecker_spintowin__cohort_retention_weekly
+    columns:
+      - name: cohort_week
+        tests:
+          - not_null
+      - name: activity_week
+        tests:
+          - not_null
+      - name: client_id
+        tests:
+          - not_null
+      - name: tenant_id
+        tests:
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['instant_win']
+      - name: weeks_since_cohort
+        tests:
+          - not_null
+      - name: cohort_size
+        tests:
+          - not_null
+      - name: retained_users
+        tests:
+          - not_null
+      - name: retention_rate
+        tests:
+          - not_null
+
+  - name: agg_oddschecker_spintowin__growth_metrics_daily
+    columns:
+      - name: date_day
+        tests:
+          - unique
+          - not_null
+      - name: client_id
+        tests:
+          - not_null
+      - name: tenant_id
+        tests:
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['instant_win']
+      - name: registrations
+        tests:
+          - not_null
+      - name: total_spins
+        tests:
+          - not_null
+      - name: active_users
+        tests:
+          - not_null
+      - name: total_prize_awards
+        tests:
+          - not_null
+      - name: voucher_prizes
+        tests:
+          - not_null
+      - name: total_voucher_value
+        tests:
+          - not_null
+      - name: oc_plus_prizes
+        tests:
+          - not_null
