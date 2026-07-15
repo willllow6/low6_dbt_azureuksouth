@@ -1,10 +1,13 @@
 {{ config(materialized='table') }}
 
 -- One row per (date_day, game_id, game_type, tenant_name), covering every active game domain.
--- purchases/gross_revenue/dpu/first_purchases/wpu/mpu are null for every domain except
--- seven_days: each seven_days session is a ticket purchase (ticket_price), so it's the one
--- IAP-style domain here. prizekings/oddschecker prize payouts are payouts, not purchases --
--- see agg_{domain}__financial_metrics_daily for the domains that do have real money flows.
+-- purchases/gross_revenue/dpu/first_purchases/wpu/mpu are populated for seven_days (each
+-- session is a ticket purchase) and prizekings_comps (each wallet deposit is treated as a
+-- purchase for this table). prizekings' two split games share one wallet, so its purchase
+-- figures are tenant-level and duplicated onto both the Spot the Ball and Raffle rows --
+-- summing gross_revenue across prizekings_comps game_ids will double-count. All other
+-- domains leave these columns null -- oddschecker prize payouts are payouts, not purchases.
+-- See agg_{domain}__financial_metrics_daily for domains with a proper financial model.
 
 with
 
@@ -123,6 +126,79 @@ pk_first_entries as (
 
 ),
 
+-- Wallet deposits, treated as purchases for this table. A deposit tops up the wallet and
+-- isn't tied to a specific contest_type, so it's computed per tenant only and joined onto
+-- both the Spot the Ball and Raffle rows for that tenant/date (not split by game_id).
+pk_deposits_raw as (
+
+    select
+        d.user_id,
+        t.tenant_name,
+        cast(convert_timezone('UTC', '{{ var("local_timezone") }}', d.transaction_created_at) as date) as date_day,
+        d.amount as revenue
+    from {{ ref('fct_prizekings_comps__deposits') }} as d
+    inner join {{ ref('dim_prizekings_comps__tenants') }} as t
+        on d.tenant_id = t.tenant_id
+
+),
+
+pk_deposits_daily as (
+
+    select
+        date_day,
+        tenant_name,
+        count(*) as purchases,
+        sum(revenue) as gross_revenue,
+        count(distinct user_id) as dpu
+    from pk_deposits_raw
+    group by 1, 2
+
+),
+
+pk_wpu as (
+
+    select
+        sp.date_day,
+        sp.tenant_name,
+        count(distinct p.user_id) as wpu
+    from pk_spine_combos as sp
+    left join pk_deposits_raw as p
+        on p.tenant_name = sp.tenant_name
+        and p.date_day between dateadd(day, -6, sp.date_day) and sp.date_day
+    group by 1, 2
+
+),
+
+pk_mpu as (
+
+    select
+        sp.date_day,
+        sp.tenant_name,
+        count(distinct p.user_id) as mpu
+    from pk_spine_combos as sp
+    left join pk_deposits_raw as p
+        on p.tenant_name = sp.tenant_name
+        and p.date_day between dateadd(day, -27, sp.date_day) and sp.date_day
+    group by 1, 2
+
+),
+
+pk_first_purchases as (
+
+    select date_day, tenant_name, count(distinct user_id) as first_purchases
+    from (
+        select
+            user_id,
+            tenant_name,
+            date_day,
+            row_number() over (partition by user_id order by date_day) as rn
+        from pk_deposits_raw
+    )
+    where rn = 1
+    group by 1, 2
+
+),
+
 game_prizekings_comps as (
 
     select
@@ -140,18 +216,22 @@ game_prizekings_comps as (
         coalesce(w.wau, 0) as wau,
         coalesce(m.mau, 0) as mau,
         coalesce(fe.first_entries, 0) as first_entries,
-        null::integer as purchases,
-        null::number as gross_revenue,
-        null::integer as dpu,
-        null::integer as first_purchases,
-        null::integer as wpu,
-        null::integer as mpu
+        coalesce(dep.purchases, 0) as purchases,
+        coalesce(dep.gross_revenue, 0) as gross_revenue,
+        coalesce(dep.dpu, 0) as dpu,
+        coalesce(fp.first_purchases, 0) as first_purchases,
+        coalesce(wp.wpu, 0) as wpu,
+        coalesce(mp.mpu, 0) as mpu
     from pk_spine_combos as sp
     left join pk_daily as d on sp.date_day = d.date_day and sp.tenant_name = d.tenant_name and sp.game_id = d.game_id
     left join pk_wau as w on sp.date_day = w.date_day and sp.tenant_name = w.tenant_name and sp.game_id = w.game_id
     left join pk_mau as m on sp.date_day = m.date_day and sp.tenant_name = m.tenant_name and sp.game_id = m.game_id
     left join pk_first_entries as fe
         on sp.date_day = fe.date_day and sp.tenant_name = fe.tenant_name and sp.game_id = fe.game_id
+    left join pk_deposits_daily as dep on sp.date_day = dep.date_day and sp.tenant_name = dep.tenant_name
+    left join pk_wpu as wp on sp.date_day = wp.date_day and sp.tenant_name = wp.tenant_name
+    left join pk_mpu as mp on sp.date_day = mp.date_day and sp.tenant_name = mp.tenant_name
+    left join pk_first_purchases as fp on sp.date_day = fp.date_day and sp.tenant_name = fp.tenant_name
     where sp.date_day >= (select min(date_day) from pk_entries_raw)
 
 ),
