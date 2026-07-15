@@ -73,3 +73,7 @@ models:
     oddschecker_spintowin:
       +schema: oddschecker_spintowin
       +query_tag: oddschecker_spintowin
+
+    low6_reporting:
+      +schema: low6_reporting
+      +query_tag: low6_reporting

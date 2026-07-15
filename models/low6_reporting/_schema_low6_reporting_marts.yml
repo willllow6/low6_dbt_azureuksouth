@@ -1,0 +1,90 @@
+version: 2
+
+models:
+
+  - name: agg_low6__game_metrics_daily
+    description: >
+      One row per (date_day, game_id, game_type, tenant_name), covering every active game
+      domain in the project. Cross-game union contract consumed by BI.
+    columns:
+      - name: date_day
+        tests:
+          - not_null
+      - name: game_id
+        tests:
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values:
+                - prize_competition
+                - bracket
+                - pickem
+                - fantasy
+                - instant_win
+                - daily_quiz
+                - live_quiz
+      - name: "date_day || '-' || game_id || '-' || game_type || '-' || coalesce(tenant_name, 'null')"
+        tests:
+          - unique
+
+  - name: agg_low6__cohort_retention_weekly
+    description: >
+      One row per (game_id, game_type, tenant_name, cohort_week, activity_week). Users who
+      never entered are excluded entirely -- they do not pad cohort_size.
+    columns:
+      - name: cohort_week
+        tests:
+          - not_null
+      - name: activity_week
+        tests:
+          - not_null
+      - name: game_id
+        tests:
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values:
+                - prize_competition
+                - bracket
+                - pickem
+                - fantasy
+                - instant_win
+                - daily_quiz
+                - live_quiz
+
+  - name: agg_low6__all_game_metrics_daily
+    description: >
+      Unions agg_low6__game_metrics_daily with any archive table in ANALYTICS_ARCHIVE.
+      Currently a passthrough view -- no archive table exists yet.
+    columns:
+      - name: date_day
+        tests:
+          - not_null
+      - name: game_id
+        tests:
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+
+  - name: agg_low6__all_cohort_retention_weekly
+    description: >
+      Unions agg_low6__cohort_retention_weekly with any archive table in ANALYTICS_ARCHIVE.
+      Currently a passthrough view -- no archive table exists yet.
+    columns:
+      - name: cohort_week
+        tests:
+          - not_null
+      - name: activity_week
+        tests:
+          - not_null
+      - name: game_id
+        tests:
+          - not_null
+      - name: game_type
+        tests:
+          - not_null

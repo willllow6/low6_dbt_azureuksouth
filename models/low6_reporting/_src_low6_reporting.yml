@@ -1,0 +1,14 @@
+version: 2
+
+sources:
+
+  - name: analytics_archive
+    description: >
+      Archive tables for retired/legacy game metrics, unioned into the all_ views below.
+      No archive tables exist yet for this Azure UK South project (verified against
+      information_schema.databases) -- add a table entry here per archive table as they
+      are created, and add a corresponding archive CTE to agg_low6__all_game_metrics_daily
+      / agg_low6__all_cohort_retention_weekly.
+    database: ANALYTICS_ARCHIVE
+    schema: PROD
+    tables: []
