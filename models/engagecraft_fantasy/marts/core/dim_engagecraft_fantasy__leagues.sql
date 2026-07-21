@@ -11,6 +11,7 @@ select
     league_id,
     tournament_id,
     commissioner_user_id,
+    regenerated_from_league_id,
     client_id,
     tenant_id,
     tenant_name,
@@ -25,7 +26,6 @@ select
     country_code,
     club_id,
     start_gameweek,
-    start_matchday,
     created_at,
     updated_at
 from leagues

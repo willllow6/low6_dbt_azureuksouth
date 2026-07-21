@@ -3,7 +3,7 @@ with
 source as (
 
     select *
-    from {{ source('engagecraft_fantasy', 'matchday_booster') }}
+    from {{ source('engagecraft_fantasy', 'fantasy_player_gameweek') }}
 
 ),
 
@@ -12,12 +12,9 @@ renamed as (
     select
 
         ---------- ids
-        id as matchday_booster_id,
-        fantasy_team_id,
-        matchday_id,
-        booster_id,
-        player_12th_man_id,
-        max_captain_player_id,
+        id as player_gameweek_id,
+        fantasy_player_id,
+        gameweek_id,
 
         ---------- strings
         'engagecraft' as client_id,
@@ -26,15 +23,19 @@ renamed as (
         'fantasy' as game_type,
 
         ---------- numerics
-        max_captain_points,
+        gameweek as gameweek_number,
+        points as gameweek_points,
+        goal_bonus_normal_points,
+        goal_bonus_captain_points,
+        minutes_played,
+        ppm_points,
 
-        ---------- booleans
-        is_cancelled,
-        processed,
+        ---------- semi-structured
+        stats,
+        breakdown,
 
         ---------- timestamps
         max_captain_reached_at::timestamp_ntz as max_captain_reached_at,
-        activated_at::timestamp_ntz as activated_at,
         created_at::timestamp_ntz as created_at,
         updated_at::timestamp_ntz as updated_at
 

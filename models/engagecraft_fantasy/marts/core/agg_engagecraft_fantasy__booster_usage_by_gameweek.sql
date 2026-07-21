@@ -3,9 +3,9 @@ with
 activations as (
 
     select
-        matchday_booster_id,
+        gameweek_booster_id,
         fantasy_team_id,
-        matchday_id,
+        gameweek_id,
         booster_id,
         is_cancelled
     from {{ ref('fct_engagecraft_fantasy__booster_activations') }}
@@ -22,25 +22,25 @@ booster_info as (
 
 ),
 
-matchdays as (
+gameweeks as (
 
     select
-        matchday_id,
-        matchday_number,
-        matchday_name,
+        gameweek_id,
+        gameweek_number,
+        gameweek_name,
         starts_at,
         client_id,
         tenant_id,
         tenant_name,
         game_type
-    from {{ ref('dim_engagecraft_fantasy__matchdays') }}
+    from {{ ref('dim_engagecraft_fantasy__gameweeks') }}
 
 ),
 
 aggregated as (
 
     select
-        a.matchday_id,
+        a.gameweek_id,
         a.booster_id,
         count(*) as total_activations,
         sum(case when a.is_cancelled then 1 else 0 end) as cancelled_activations,
@@ -54,24 +54,24 @@ aggregated as (
 enriched as (
 
     select
-        ag.matchday_id,
-        m.matchday_number,
-        m.matchday_name,
-        m.starts_at,
+        ag.gameweek_id,
+        g.gameweek_number,
+        g.gameweek_name,
+        g.starts_at,
         ag.booster_id,
         bi.booster_code,
         bi.booster_name,
-        m.client_id,
-        m.tenant_id,
-        m.tenant_name,
-        m.game_type,
+        g.client_id,
+        g.tenant_id,
+        g.tenant_name,
+        g.game_type,
         ag.total_activations,
         ag.cancelled_activations,
         ag.net_activations,
         ag.teams_using_booster
     from aggregated as ag
-    left join matchdays as m
-        on ag.matchday_id = m.matchday_id
+    left join gameweeks as g
+        on ag.gameweek_id = g.gameweek_id
     left join booster_info as bi
         on ag.booster_id = bi.booster_id
 

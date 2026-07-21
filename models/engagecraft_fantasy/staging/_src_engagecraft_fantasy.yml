@@ -3,14 +3,13 @@ version: 2
 sources:
 
   - name: engagecraft_fantasy
-    description: EngageCraft World Cup fantasy football game database
+    description: EngageCraft Premier League fantasy football game database
     database: low6_azureuksouth
     schema: adfengagecraftfantasy
     tables:
 
       - name: user
       - name: tournament_calendar
-      - name: matchday
       - name: contestants
       - name: persons
       - name: squad_membership
@@ -18,9 +17,10 @@ sources:
       - name: fantasy_team
       - name: fantasy_team_player
       - name: fantasy_team_transfer
-      - name: fantasy_player_matchday
-      - name: fantasy_team_matchday_snapshot
       - name: booster
-      - name: matchday_booster
       - name: league
       - name: league_entry
+      - name: fantasy_player_gameweek
+      - name: fantasy_team_gameweek_snapshot
+      - name: gameweek
+      - name: gameweek_booster

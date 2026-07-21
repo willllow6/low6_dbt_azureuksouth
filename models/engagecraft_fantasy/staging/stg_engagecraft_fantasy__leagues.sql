@@ -15,6 +15,7 @@ renamed as (
         id as league_id,
         tournament_calendar_id as tournament_id,
         commissioner_user_id,
+        regenerated_from_league_id,
 
         ---------- strings
         'engagecraft' as client_id,
@@ -30,7 +31,6 @@ renamed as (
 
         ---------- numerics
         start_gameweek,
-        start_matchday,
 
         ---------- booleans
         is_public,

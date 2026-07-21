@@ -3,15 +3,15 @@ with
 player_scores as (
 
     select
-        player_matchday_id,
+        player_gameweek_id,
         fantasy_player_id,
-        matchday_id,
-        matchday_points,
+        gameweek_id,
+        gameweek_points,
         minutes_played,
-        bonus_points,
+        ppm_points,
         goal_bonus_normal_points,
         goal_bonus_captain_points
-    from {{ ref('fct_engagecraft_fantasy__player_matchday_scores') }}
+    from {{ ref('fct_engagecraft_fantasy__player_gameweek_scores') }}
 
 ),
 
@@ -47,24 +47,24 @@ players as (
 
 ),
 
-matchdays as (
+gameweeks as (
 
     select
-        matchday_id,
-        matchday_number,
-        matchday_name,
+        gameweek_id,
+        gameweek_number,
+        gameweek_name,
         starts_at
-    from {{ ref('dim_engagecraft_fantasy__matchdays') }}
+    from {{ ref('dim_engagecraft_fantasy__gameweeks') }}
 
 ),
 
 enriched as (
 
     select
-        ps.matchday_id,
-        m.matchday_number,
-        m.matchday_name,
-        m.starts_at,
+        ps.gameweek_id,
+        g.gameweek_number,
+        g.gameweek_name,
+        g.starts_at,
         ps.fantasy_player_id,
         p.full_name,
         p.fantasy_position,
@@ -81,16 +81,16 @@ enriched as (
         coalesce(sc.times_started, 0) as times_started,
         coalesce(sc.times_captained, 0) as times_captained,
         coalesce(sc.times_vice_captained, 0) as times_vice_captained,
-        ps.matchday_points,
+        ps.gameweek_points,
         ps.minutes_played,
-        ps.bonus_points,
+        ps.ppm_points,
         ps.goal_bonus_normal_points,
         ps.goal_bonus_captain_points
     from player_scores as ps
     left join players as p
         on ps.fantasy_player_id = p.fantasy_player_id
-    left join matchdays as m
-        on ps.matchday_id = m.matchday_id
+    left join gameweeks as g
+        on ps.gameweek_id = g.gameweek_id
     left join selection_counts as sc
         on ps.fantasy_player_id = sc.fantasy_player_id
 

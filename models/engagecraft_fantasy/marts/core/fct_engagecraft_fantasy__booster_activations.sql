@@ -3,14 +3,14 @@ with
 booster_activations as (
 
     select *
-    from {{ ref('stg_engagecraft_fantasy__matchday_boosters') }}
+    from {{ ref('stg_engagecraft_fantasy__gameweek_boosters') }}
 
 )
 
 select
-    matchday_booster_id,
+    gameweek_booster_id,
     fantasy_team_id,
-    matchday_id,
+    gameweek_id,
     booster_id,
     player_12th_man_id,
     max_captain_player_id,

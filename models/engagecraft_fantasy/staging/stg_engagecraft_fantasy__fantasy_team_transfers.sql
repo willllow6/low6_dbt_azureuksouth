@@ -14,8 +14,7 @@ renamed as (
         ---------- ids
         id as transfer_id,
         fantasy_team_id,
-        matchday_id as source_matchday_id,
-        target_matchday_id,
+        gameweek_id,
         transfer_in_id as player_in_id,
         transfer_out_id as player_out_id,
         superseded_by_id,
@@ -26,9 +25,13 @@ renamed as (
         'engagecraft' as tenant_name,
         'fantasy' as game_type,
         status as transfer_status,
+        updated_formation,
 
         ---------- numerics
-        gameweek,
+        gameweek as gameweek_number,
+
+        ---------- semi-structured
+        metadata,
 
         ---------- timestamps
         scheduled_at::timestamp_ntz as scheduled_at,

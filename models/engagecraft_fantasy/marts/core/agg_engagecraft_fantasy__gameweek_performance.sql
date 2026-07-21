@@ -1,32 +1,32 @@
 with
 
-matchdays as (
+gameweeks as (
 
     select
-        matchday_id,
+        gameweek_id,
         tournament_id,
-        matchday_number,
-        matchday_name,
-        matchday_status,
+        gameweek_number,
+        gameweek_name,
+        gameweek_status,
         starts_at,
         ends_at,
         client_id,
         tenant_id,
         tenant_name,
         game_type
-    from {{ ref('dim_engagecraft_fantasy__matchdays') }}
+    from {{ ref('dim_engagecraft_fantasy__gameweeks') }}
 
 ),
 
 team_perf as (
 
     select
-        matchday_id,
+        gameweek_id,
         count(distinct fantasy_team_id) as teams_with_scores,
         avg(total_points) as avg_team_points,
         max(total_points) as top_team_points,
         sum(total_points) as total_points_distributed
-    from {{ ref('fct_engagecraft_fantasy__team_matchday_snapshots') }}
+    from {{ ref('fct_engagecraft_fantasy__team_gameweek_snapshots') }}
     group by 1
 
 ),
@@ -34,7 +34,7 @@ team_perf as (
 transfers_confirmed as (
 
     select
-        target_matchday_id as matchday_id,
+        gameweek_id,
         count(*) as transfers_confirmed
     from {{ ref('fct_engagecraft_fantasy__transfers') }}
     where transfer_status = 'applied'
@@ -45,7 +45,7 @@ transfers_confirmed as (
 boosters_applied as (
 
     select
-        matchday_id,
+        gameweek_id,
         count(*) as boosters_applied,
         count(distinct fantasy_team_id) as teams_using_boosters
     from {{ ref('fct_engagecraft_fantasy__booster_activations') }}
@@ -55,17 +55,17 @@ boosters_applied as (
 )
 
 select
-    m.matchday_id,
-    m.tournament_id,
-    m.matchday_number,
-    m.matchday_name,
-    m.matchday_status,
-    m.starts_at,
-    m.ends_at,
-    m.client_id,
-    m.tenant_id,
-    m.tenant_name,
-    m.game_type,
+    g.gameweek_id,
+    g.tournament_id,
+    g.gameweek_number,
+    g.gameweek_name,
+    g.gameweek_status,
+    g.starts_at,
+    g.ends_at,
+    g.client_id,
+    g.tenant_id,
+    g.tenant_name,
+    g.game_type,
     coalesce(tp.teams_with_scores, 0) as teams_with_scores,
     tp.avg_team_points,
     tp.top_team_points,
@@ -73,10 +73,10 @@ select
     coalesce(t.transfers_confirmed, 0) as transfers_confirmed,
     coalesce(b.boosters_applied, 0) as boosters_applied,
     coalesce(b.teams_using_boosters, 0) as teams_using_boosters
-from matchdays as m
+from gameweeks as g
 left join team_perf as tp
-    on m.matchday_id = tp.matchday_id
+    on g.gameweek_id = tp.gameweek_id
 left join transfers_confirmed as t
-    on m.matchday_id = t.matchday_id
+    on g.gameweek_id = t.gameweek_id
 left join boosters_applied as b
-    on m.matchday_id = b.matchday_id
+    on g.gameweek_id = b.gameweek_id

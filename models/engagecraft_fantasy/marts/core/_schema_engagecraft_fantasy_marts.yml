@@ -47,9 +47,9 @@ models:
         tests:
           - not_null
 
-  - name: dim_engagecraft_fantasy__matchdays
+  - name: dim_engagecraft_fantasy__gameweeks
     columns:
-      - name: matchday_id
+      - name: gameweek_id
         tests:
           - unique
           - not_null
@@ -70,10 +70,10 @@ models:
           - not_null
           - accepted_values:
               values: ['fantasy']
-      - name: matchday_status
+      - name: gameweek_status
         tests:
           - not_null
-      - name: matchday_number
+      - name: gameweek_number
         tests:
           - not_null
 
@@ -193,7 +193,7 @@ models:
         tests:
           - not_null
 
-  - name: fct_engagecraft_fantasy__team_matchday_snapshots
+  - name: fct_engagecraft_fantasy__team_gameweek_snapshots
     columns:
       - name: snapshot_id
         tests:
@@ -205,12 +205,12 @@ models:
           - relationships:
               to: ref('dim_engagecraft_fantasy__fantasy_teams')
               field: fantasy_team_id
-      - name: matchday_id
+      - name: gameweek_id
         tests:
           - not_null
           - relationships:
-              to: ref('dim_engagecraft_fantasy__matchdays')
-              field: matchday_id
+              to: ref('dim_engagecraft_fantasy__gameweeks')
+              field: gameweek_id
       - name: client_id
         tests:
           - not_null
@@ -226,9 +226,9 @@ models:
         tests:
           - not_null
 
-  - name: fct_engagecraft_fantasy__player_matchday_scores
+  - name: fct_engagecraft_fantasy__player_gameweek_scores
     columns:
-      - name: player_matchday_id
+      - name: player_gameweek_id
         tests:
           - unique
           - not_null
@@ -238,12 +238,12 @@ models:
           - relationships:
               to: ref('dim_engagecraft_fantasy__players')
               field: fantasy_player_id
-      - name: matchday_id
+      - name: gameweek_id
         tests:
           - not_null
           - relationships:
-              to: ref('dim_engagecraft_fantasy__matchdays')
-              field: matchday_id
+              to: ref('dim_engagecraft_fantasy__gameweeks')
+              field: gameweek_id
       - name: client_id
         tests:
           - not_null
@@ -298,6 +298,12 @@ models:
           - relationships:
               to: ref('dim_engagecraft_fantasy__fantasy_teams')
               field: fantasy_team_id
+      - name: gameweek_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_engagecraft_fantasy__gameweeks')
+              field: gameweek_id
       - name: player_in_id
         tests:
           - not_null
@@ -321,7 +327,7 @@ models:
 
   - name: fct_engagecraft_fantasy__booster_activations
     columns:
-      - name: matchday_booster_id
+      - name: gameweek_booster_id
         tests:
           - unique
           - not_null
@@ -331,12 +337,12 @@ models:
           - relationships:
               to: ref('dim_engagecraft_fantasy__fantasy_teams')
               field: fantasy_team_id
-      - name: matchday_id
+      - name: gameweek_id
         tests:
           - not_null
           - relationships:
-              to: ref('dim_engagecraft_fantasy__matchdays')
-              field: matchday_id
+              to: ref('dim_engagecraft_fantasy__gameweeks')
+              field: gameweek_id
       - name: booster_id
         tests:
           - not_null
@@ -417,7 +423,7 @@ models:
         tests:
           - not_null
 
-  - name: mart_engagecraft_fantasy__team_matchday_performance
+  - name: mart_engagecraft_fantasy__team_gameweek_performance
     columns:
       - name: snapshot_id
         tests:
@@ -426,7 +432,7 @@ models:
       - name: fantasy_team_id
         tests:
           - not_null
-      - name: matchday_id
+      - name: gameweek_id
         tests:
           - not_null
       - name: client_id
@@ -444,16 +450,16 @@ models:
         tests:
           - not_null
 
-  - name: mart_engagecraft_fantasy__player_matchday_scores
+  - name: mart_engagecraft_fantasy__player_gameweek_scores
     columns:
-      - name: player_matchday_id
+      - name: player_gameweek_id
         tests:
           - unique
           - not_null
       - name: fantasy_player_id
         tests:
           - not_null
-      - name: matchday_id
+      - name: gameweek_id
         tests:
           - not_null
       - name: client_id
@@ -510,9 +516,9 @@ models:
         tests:
           - not_null
 
-  - name: agg_engagecraft_fantasy__matchday_performance
+  - name: agg_engagecraft_fantasy__gameweek_performance
     columns:
-      - name: matchday_id
+      - name: gameweek_id
         tests:
           - unique
           - not_null
@@ -531,9 +537,9 @@ models:
           - accepted_values:
               values: ['fantasy']
 
-  - name: agg_engagecraft_fantasy__player_picks_by_matchday
+  - name: agg_engagecraft_fantasy__player_picks_by_gameweek
     columns:
-      - name: matchday_id
+      - name: gameweek_id
         tests:
           - not_null
       - name: fantasy_player_id
@@ -551,9 +557,9 @@ models:
           - accepted_values:
               values: ['fantasy']
 
-  - name: agg_engagecraft_fantasy__booster_usage_by_matchday
+  - name: agg_engagecraft_fantasy__booster_usage_by_gameweek
     columns:
-      - name: matchday_id
+      - name: gameweek_id
         tests:
           - not_null
       - name: booster_id
@@ -571,9 +577,9 @@ models:
           - accepted_values:
               values: ['fantasy']
 
-  - name: agg_engagecraft_fantasy__transfer_popularity_by_matchday
+  - name: agg_engagecraft_fantasy__transfer_popularity_by_gameweek
     columns:
-      - name: matchday_id
+      - name: gameweek_id
         tests:
           - not_null
       - name: fantasy_player_id

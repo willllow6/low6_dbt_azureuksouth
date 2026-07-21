@@ -3,7 +3,7 @@ with
 scores as (
 
     select *
-    from {{ ref('fct_engagecraft_fantasy__player_matchday_scores') }}
+    from {{ ref('fct_engagecraft_fantasy__player_gameweek_scores') }}
 
 ),
 
@@ -24,24 +24,24 @@ players as (
 
 ),
 
-matchdays as (
+gameweeks as (
 
     select
-        matchday_id,
-        matchday_number,
-        matchday_name,
+        gameweek_id,
+        gameweek_number,
+        gameweek_name,
         starts_at,
         ends_at
-    from {{ ref('dim_engagecraft_fantasy__matchdays') }}
+    from {{ ref('dim_engagecraft_fantasy__gameweeks') }}
 
 ),
 
 joined as (
 
     select
-        s.player_matchday_id,
+        s.player_gameweek_id,
         s.fantasy_player_id,
-        s.matchday_id,
+        s.gameweek_id,
         p.player_id,
         p.full_name,
         p.fantasy_position,
@@ -51,15 +51,15 @@ joined as (
         p.tournament_group,
         p.nationality,
         p.ownership_pct,
-        m.matchday_number,
-        m.matchday_name,
-        m.starts_at,
-        m.ends_at,
-        s.matchday_points,
+        g.gameweek_number,
+        g.gameweek_name,
+        g.starts_at,
+        g.ends_at,
+        s.gameweek_points,
         s.goal_bonus_normal_points,
         s.goal_bonus_captain_points,
         s.minutes_played,
-        s.bonus_points,
+        s.ppm_points,
         s.client_id,
         s.tenant_id,
         s.tenant_name,
@@ -69,8 +69,8 @@ joined as (
     from scores as s
     left join players as p
         on s.fantasy_player_id = p.fantasy_player_id
-    left join matchdays as m
-        on s.matchday_id = m.matchday_id
+    left join gameweeks as g
+        on s.gameweek_id = g.gameweek_id
 
 )
 

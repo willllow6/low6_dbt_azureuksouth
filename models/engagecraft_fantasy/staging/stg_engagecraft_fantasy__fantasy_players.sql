@@ -32,6 +32,7 @@ renamed as (
 
         ---------- booleans
         is_visible,
+        has_left,
 
         ---------- timestamps
         created_at::timestamp_ntz as created_at,

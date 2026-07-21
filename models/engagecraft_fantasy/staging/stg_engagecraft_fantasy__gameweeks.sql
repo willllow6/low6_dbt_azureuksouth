@@ -3,7 +3,7 @@ with
 source as (
 
     select *
-    from {{ source('engagecraft_fantasy', 'matchday') }}
+    from {{ source('engagecraft_fantasy', 'gameweek') }}
 
 ),
 
@@ -12,23 +12,25 @@ renamed as (
     select
 
         ---------- ids
-        id as matchday_id,
+        id as gameweek_id,
         tournament_calendar_id as tournament_id,
+        finalised_by_admin_user_id,
 
         ---------- strings
         'engagecraft' as client_id,
         'engagecraft' as tenant_id,
         'engagecraft' as tenant_name,
         'fantasy' as game_type,
-        name as matchday_name,
-        status as matchday_status,
+        name as gameweek_name,
+        status as gameweek_status,
+        knockout_round,
 
         ---------- numerics
-        matchday_number,
-        expected_match_count,
+        number as gameweek_number,
         budget_initial,
 
         ---------- booleans
+        is_double_gameweek,
         case
             when deleted_at is null
                 and status not in ('completed', 'cancelled')
@@ -39,7 +41,8 @@ renamed as (
         ---------- timestamps
         starts_at::timestamp_ntz as starts_at,
         ends_at::timestamp_ntz as ends_at,
-        locks_at::timestamp_ntz as locks_at,
+        deadline_at::timestamp_ntz as deadline_at,
+        finalised_at::timestamp_ntz as finalised_at,
         deleted_at::timestamp_ntz as deleted_at,
         created_at::timestamp_ntz as created_at,
         updated_at::timestamp_ntz as updated_at
