@@ -31,7 +31,7 @@ cleaned as (
             when site = 'https://ukcc.co.uk'             then 2
             else null
         end                                 as site_id,
-        replace(substr(tickets, 2, len(tickets) - 2), '\\', '') as tmp,
+        tickets,
         created_at::timestamp_ntz           as created_at,
         completed_at::timestamp_ntz         as completed_at,
         deleted_at::timestamp_ntz           as deleted_at,
@@ -56,25 +56,7 @@ fixed as (
         game_type,
         site_id,
         url,
-        parse_json(
-            concat(
-                '[',
-                regexp_replace(
-                    regexp_replace(
-                        regexp_replace(
-                            regexp_replace(
-                                tmp,
-                                '}"\\s*,\\s*"{', '},{'
-                            ),
-                            '(^"|"$)', ''
-                        ),
-                        '"}$', '}'
-                    ),
-                    '("name":"[^"]+)"\\s+([^"]+")', '\\1\\\\\" \\2'
-                ),
-                ']'
-            )
-        )                                   as ticket_array,
+        parse_json(tickets) as ticket_array,
         created_date,
         created_at,
         completed_at,
