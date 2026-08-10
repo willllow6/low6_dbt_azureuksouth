@@ -1,0 +1,49 @@
+version: 2
+
+models:
+
+  - name: int_gaming1__selection_entries
+    description: >
+      Grain change from stg_gaming1__selections (selection grain) to entry grain
+      (one row per user per contest). Selection-sourced entries only -- a future
+      gaming1 game type would add a parallel int_gaming1__<type>_entries model.
+    columns:
+      - name: entry_id
+        tests:
+          - unique
+          - not_null
+      - name: user_id
+        tests:
+          - not_null
+      - name: contest_id
+        tests:
+          - not_null
+      - name: client_id
+        tests:
+          - not_null
+      - name: tenant_id
+        tests:
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['pickem']
+
+  - name: int_gaming1__user_tenants
+    description: >
+      Resolves each user's best-known tenant: location -> tenant_code match, falling back to the
+      tenant of the user's first entry, falling back to client_id. gaming1's users.location is null
+      for every row in production, so this exists to keep dim_gaming1__users (and everything built
+      on it) reliably tenant-attributed despite that data gap.
+    columns:
+      - name: user_id
+        tests:
+          - unique
+          - not_null
+      - name: tenant_id
+        tests:
+          - not_null
+      - name: tenant_name
+        tests:
+          - not_null

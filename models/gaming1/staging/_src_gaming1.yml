@@ -1,0 +1,22 @@
+version: 2
+
+sources:
+
+  - name: gaming1
+    description: gaming1 picks prod db
+    database: low6_azureuksouth
+    schema: adfgaming1picks
+    tags: ['gaming1']
+    tables:
+
+      - name: options
+
+      - name: pickems
+
+      - name: questions
+
+      - name: tenants
+
+      - name: user_selections
+
+      - name: users

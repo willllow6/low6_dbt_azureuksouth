@@ -1109,6 +1109,140 @@ game_itv_spinoff_live as (
     left join itv_live_first_entries as fe on sp.date_day = fe.date_day
     where sp.date_day >= (select min(date_day) from itv_live_entries_raw)
 
+),
+
+--------------------------------------------------------------------------------
+-- gaming1 (pickem, multi-tenant)
+--------------------------------------------------------------------------------
+
+-- tenant_name is resolved via e.tenant_id -> dim_gaming1__tenants (the contest's tenant), not from
+-- dim_gaming1__users: gaming1's users.location is null for every row in production, so a user's
+-- tenant can't be resolved off the user record alone. Registrations reuse
+-- agg_gaming1__registration_metrics_daily's per-tenant resolution (via each user's first entry).
+g1_entries_raw as (
+
+    select
+        e.user_id,
+        coalesce(t.tenant_name, e.client_id) as tenant_name,
+        cast(convert_timezone('UTC', '{{ var("local_timezone") }}', e.entered_at) as date) as date_day
+    from {{ ref('fct_gaming1__entries') }} as e
+    left join {{ ref('dim_gaming1__tenants') }} as t
+        on e.tenant_id = t.tenant_id
+
+),
+
+g1_combos as (
+
+    select distinct tenant_name from g1_entries_raw
+
+),
+
+g1_spine_combos as (
+
+    select d.date_day, c.tenant_name
+    from date_spine as d
+    cross join g1_combos as c
+
+),
+
+g1_daily as (
+
+    select
+        date_day,
+        tenant_name,
+        count(*) as entries,
+        count(distinct user_id) as dau
+    from g1_entries_raw
+    group by 1, 2
+
+),
+
+g1_wau as (
+
+    select
+        sp.date_day,
+        sp.tenant_name,
+        count(distinct e.user_id) as wau
+    from g1_spine_combos as sp
+    left join g1_entries_raw as e
+        on e.tenant_name = sp.tenant_name
+        and e.date_day between dateadd(day, -6, sp.date_day) and sp.date_day
+    group by 1, 2
+
+),
+
+g1_mau as (
+
+    select
+        sp.date_day,
+        sp.tenant_name,
+        count(distinct e.user_id) as mau
+    from g1_spine_combos as sp
+    left join g1_entries_raw as e
+        on e.tenant_name = sp.tenant_name
+        and e.date_day between dateadd(day, -27, sp.date_day) and sp.date_day
+    group by 1, 2
+
+),
+
+g1_first_entries as (
+
+    select date_day, tenant_name, count(distinct user_id) as first_entries
+    from (
+        select
+            user_id,
+            date_day,
+            tenant_name,
+            row_number() over (partition by user_id order by date_day) as rn
+        from g1_entries_raw
+    )
+    where rn = 1
+    group by 1, 2
+
+),
+
+g1_regs as (
+
+    select
+        date_day,
+        tenant_name,
+        sum(new_registrations) as registrations
+    from {{ ref('agg_gaming1__registration_metrics_daily') }}
+    group by 1, 2
+
+),
+
+game_gaming1 as (
+
+    select
+        sp.date_day,
+        'gaming1' as game_id,
+        'Gaming1' as game_name,
+        'pickem' as game_type,
+        'gaming1' as client_id,
+        'adfgaming1picks' as source_schema,
+        'low6_azureuksouth' as source_database,
+        sp.tenant_name,
+        coalesce(r.registrations, 0) as registrations,
+        coalesce(d.entries, 0) as entries,
+        coalesce(d.dau, 0) as dau,
+        coalesce(w.wau, 0) as wau,
+        coalesce(m.mau, 0) as mau,
+        coalesce(fe.first_entries, 0) as first_entries,
+        null::integer as purchases,
+        null::number as gross_revenue,
+        null::integer as dpu,
+        null::integer as first_purchases,
+        null::integer as wpu,
+        null::integer as mpu
+    from g1_spine_combos as sp
+    left join g1_daily as d on sp.date_day = d.date_day and sp.tenant_name = d.tenant_name
+    left join g1_wau as w on sp.date_day = w.date_day and sp.tenant_name = w.tenant_name
+    left join g1_mau as m on sp.date_day = m.date_day and sp.tenant_name = m.tenant_name
+    left join g1_first_entries as fe on sp.date_day = fe.date_day and sp.tenant_name = fe.tenant_name
+    left join g1_regs as r on sp.date_day = r.date_day and sp.tenant_name = r.tenant_name
+    where sp.date_day >= (select min(date_day) from g1_entries_raw)
+
 )
 
 select * from game_prizekings_comps
@@ -1126,3 +1260,5 @@ union all
 select * from game_itv_spinoff
 union all
 select * from game_itv_spinoff_live
+union all
+select * from game_gaming1

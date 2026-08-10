@@ -34,6 +34,7 @@ vars:
   tipman_start_date: '2026-04-24'  # TODO: confirm tipman go-live date
   engagecraft_fantasy_start_date: '2026-05-22'
   oddschecker_spintowin_start_date: '2026-06-03'
+  gaming1_start_date: '2026-07-24'
   local_timezone: 'Europe/London'
 
 on-run-start:
@@ -73,6 +74,10 @@ models:
     oddschecker_spintowin:
       +schema: oddschecker_spintowin
       +query_tag: oddschecker_spintowin
+
+    gaming1:
+      +schema: gaming1
+      +query_tag: gaming1
 
     low6_reporting:
       +schema: low6_reporting

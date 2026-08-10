@@ -563,6 +563,80 @@ game_itv_spinoff_live as (
         on ua.cohort_week = cs.cohort_week
     group by 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, cs.cohort_size
 
+),
+
+--------------------------------------------------------------------------------
+-- gaming1 (pickem, multi-tenant)
+--------------------------------------------------------------------------------
+
+-- tenant_name is resolved via e.tenant_id -> dim_gaming1__tenants (the contest's tenant), not from
+-- dim_gaming1__users: gaming1's users.location is null for every row in production, so a user's
+-- tenant can't be resolved off the user record alone.
+g1_entries as (
+
+    select
+        e.user_id,
+        coalesce(t.tenant_name, e.client_id) as tenant_name,
+        date_trunc('week', cast(convert_timezone('UTC', 'America/New_York', e.entered_at) as date)) as activity_week
+    from {{ ref('fct_gaming1__entries') }} as e
+    left join {{ ref('dim_gaming1__tenants') }} as t
+        on e.tenant_id = t.tenant_id
+
+),
+
+g1_cohort_weeks as (
+
+    select user_id, tenant_name, min(activity_week) as cohort_week
+    from g1_entries
+    group by 1, 2
+
+),
+
+g1_cohort_sizes as (
+
+    select cohort_week, tenant_name, count(distinct user_id) as cohort_size
+    from g1_cohort_weeks
+    group by 1, 2
+
+),
+
+g1_user_activity as (
+
+    select
+        e.user_id,
+        cw.tenant_name,
+        cw.cohort_week,
+        e.activity_week,
+        datediff('week', cw.cohort_week, e.activity_week) as weeks_since_cohort
+    from g1_entries as e
+    inner join g1_cohort_weeks as cw
+        on e.user_id = cw.user_id
+        and e.tenant_name = cw.tenant_name
+
+),
+
+game_gaming1 as (
+
+    select
+        'gaming1' as game_id,
+        'Gaming1' as game_name,
+        'pickem' as game_type,
+        'gaming1' as client_id,
+        'adfgaming1picks' as source_schema,
+        'low6_azureuksouth' as source_database,
+        ua.tenant_name,
+        ua.cohort_week,
+        ua.activity_week,
+        ua.weeks_since_cohort,
+        cs.cohort_size,
+        count(distinct ua.user_id) as retained_users,
+        round(count(distinct ua.user_id) / nullif(cs.cohort_size, 0), 4) as retention_rate
+    from g1_user_activity as ua
+    inner join g1_cohort_sizes as cs
+        on ua.cohort_week = cs.cohort_week
+        and ua.tenant_name = cs.tenant_name
+    group by 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, cs.cohort_size
+
 )
 
 select
@@ -612,3 +686,9 @@ select
     tenant_name, cohort_week, activity_week, weeks_since_cohort, cohort_size,
     retained_users, retention_rate
 from game_itv_spinoff_live
+union all
+select
+    game_id, game_name, game_type, client_id, source_schema, source_database,
+    tenant_name, cohort_week, activity_week, weeks_since_cohort, cohort_size,
+    retained_users, retention_rate
+from game_gaming1
