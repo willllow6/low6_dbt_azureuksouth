@@ -515,6 +515,12 @@ models:
       - name: registrations
         tests:
           - not_null
+      - name: pre_mini_reg_registrations
+        tests:
+          - not_null
+      - name: post_mini_reg_registrations
+        tests:
+          - not_null
 
   - name: agg_engagecraft_fantasy__gameweek_performance
     columns:

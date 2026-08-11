@@ -12,7 +12,9 @@ registrations as (
 
     select
         cast(created_at as date) as date_day,
-        count(*) as registrations
+        count(*) as registrations,
+        count(*) as pre_mini_reg_registrations,
+        sum(case when favourite_club_id is not null then 1 else 0 end) as post_mini_reg_registrations
     from {{ ref('dim_engagecraft_fantasy__users') }}
     group by 1
 
@@ -83,6 +85,8 @@ select
     'engagecraft' as tenant_name,
     'fantasy' as game_type,
     coalesce(r.registrations, 0) as registrations,
+    coalesce(r.pre_mini_reg_registrations, 0) as pre_mini_reg_registrations,
+    coalesce(r.post_mini_reg_registrations, 0) as post_mini_reg_registrations,
     coalesce(tc.teams_created, 0) as teams_created,
     coalesce(tr.transfers_confirmed, 0) as transfers_confirmed,
     coalesce(ba.boosters_applied, 0) as boosters_applied,
