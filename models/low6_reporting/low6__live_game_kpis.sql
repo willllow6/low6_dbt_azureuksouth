@@ -179,9 +179,44 @@ engagecraft_fantasy as (
     from {{ ref('dim_engagecraft_fantasy__fantasy_teams') }}
     group by 1  
 
+),
+
+tipman_pickem as (
+
+    select
+        'tmpkm' as app_id,
+        count(*) as entries,
+        sum(case when entry_date_local = current_date() - 1 then 1 else 0 end) as yesterday_entries,
+        sum(case when entry_date_local >= current_date() - 8 and entry_date_local < current_date() then 1 else 0 end) as last_7_days_entries,
+        sum(case when entry_date_local >= current_date() - 29 and entry_date_local < current_date() then 1 else 0 end) as last_28_days_entries,
+        count(distinct user_id) as entrants,
+        count(distinct case when entry_date_local = current_date() - 1 then user_id else null end) as yesterday_entrants,
+        count(distinct case when entry_date_local >= current_date() - 8 and entry_date_local < current_date() then user_id else null end) as last_7_days_entrants,
+        count(distinct case when entry_date_local >= current_date() - 29 and entry_date_local < current_date() then user_id else null end) as last_28_days_entrants,
+        count(distinct contest_id) as contests,
+        max(cast(entry_date_local as date)) as last_entry_date
+    from {{ ref('mart_tipman_pickem__entries') }}
+    group by 1  
+
+),
+
+gaming1_pickem as (
+
+    select
+        'cirpkm' as app_id,
+        count(*) as entries,
+        sum(case when cast(entered_at as date) = current_date() - 1 then 1 else 0 end) as yesterday_entries,
+        sum(case when cast(entered_at as date) >= current_date() - 8 and cast(entered_at as date) < current_date() then 1 else 0 end) as last_7_days_entries,
+        sum(case when cast(entered_at as date) >= current_date() - 29 and cast(entered_at as date) < current_date() then 1 else 0 end) as last_28_days_entries,
+        count(distinct user_id) as entrants,
+        count(distinct case when cast(entered_at as date) = current_date() - 1 then user_id else null end) as yesterday_entrants,
+        count(distinct case when cast(entered_at as date) >= current_date() - 8 and cast(entered_at as date) < current_date() then user_id else null end) as last_7_days_entrants,
+        count(distinct case when cast(entered_at as date) >= current_date() - 29 and cast(entered_at as date) < current_date() then user_id else null end) as last_28_days_entrants,
+        count(distinct contest_id) as contests,
+        max(cast(entered_at as date)) as last_entry_date
+    from {{ ref('fct_gaming1__entries') }}
+    where game_type = 'pickem'
 )
-
-
 
 -- select *
 -- from itv_spinoff
@@ -226,3 +261,8 @@ union all
 
 select *
 from engagecraft_fantasy
+
+union all
+
+select *
+from gaming1_pickem
