@@ -1,0 +1,32 @@
+# Committed profiles.yml — used ONLY by Snowflake-native execution
+# (EXECUTE DBT PROJECT). Your real local profiles.yml with key-pair auth
+# stays in ~/.dbt/ and is untouched by this file.
+#
+# The top-level key below MUST exactly match the "profile:" value in
+# dbt_project.yml for this project.
+#
+# account / user are intentionally blank — Snowflake runs the dbt project
+# under the calling session's account/user context, these fields are not
+# used for native execution but are required keys.
+
+low6_dbt_azureuksouth:
+  target: dev
+  outputs:
+    dev:
+      type: snowflake
+      account: ""
+      user: ""
+      role: compute_role
+      warehouse: compute_wh
+      database: low6_azureuksouth
+      schema: "{{ env_var('DBT_SCHEMA') }}"
+      threads: 8
+    prod:
+      type: snowflake
+      account: ""
+      user: ""
+      role: compute_role
+      warehouse: compute_wh
+      database: low6_azureuksouth
+      schema: analytics
+      threads: 8
