@@ -3,11 +3,9 @@
 -- One row per (date_day, game_id, game_type, tenant_name), covering every active game domain.
 -- purchases/gross_revenue/dpu/first_purchases/wpu/mpu are populated for seven_days (each
 -- session is a ticket purchase) and prizekings_comps (each wallet deposit is treated as a
--- purchase for this table). prizekings' two split games share one wallet, so its purchase
--- figures are tenant-level and duplicated onto both the Spot the Ball and Raffle rows --
--- summing gross_revenue across prizekings_comps game_ids will double-count. All other
--- domains leave these columns null -- oddschecker prize payouts are payouts, not purchases.
--- See agg_{domain}__financial_metrics_daily for domains with a proper financial model.
+-- purchase for this table). All other domains leave these columns null -- oddschecker prize
+-- payouts are payouts, not purchases. See agg_{domain}__financial_metrics_daily for domains
+-- with a proper financial model.
 
 with
 
@@ -21,10 +19,10 @@ date_spine as (
 
 --------------------------------------------------------------------------------
 -- prizekings_comps (prize_competition, multi-tenant)
--- Split into two games by contest_type -- 'Spot the Ball' and 'Raffle' -- instead
--- of using the tenant as the game name. Registrations aren't tied to a single
--- contest_type (a user can enter both), so they're left null on both split games,
--- same as the seven_days multi-product split below.
+-- One row per tenant -- previously split into two games by contest_type ('Spot the
+-- Ball' and 'Raffle'), but that duplicated tenant-level metrics (registrations,
+-- wallet deposits) identically onto both rows, since neither is tied to a single
+-- contest_type. Collapsed back to a single game_id per tenant.
 --------------------------------------------------------------------------------
 
 pk_entries_raw as (
@@ -33,32 +31,22 @@ pk_entries_raw as (
         e.user_id,
         e.client_id,
         t.tenant_name,
-        case c.contest_type
-            when 'spot_the_ball' then 'prizekings_comps_spot_the_ball'
-            when 'draw' then 'prizekings_comps_raffle'
-        end as game_id,
-        case c.contest_type
-            when 'spot_the_ball' then 'Spot the Ball'
-            when 'draw' then 'Raffle'
-        end as game_name,
         cast(convert_timezone('UTC', '{{ var("local_timezone") }}', e.entered_at) as date) as date_day
     from {{ ref('fct_prizekings_comps__entries') }} as e
     inner join {{ ref('dim_prizekings_comps__tenants') }} as t
         on e.tenant_id = t.tenant_id
-    inner join {{ ref('dim_prizekings_comps__contests') }} as c
-        on e.contest_sk = c.contest_sk
 
 ),
 
 pk_combos as (
 
-    select distinct client_id, tenant_name, game_id, game_name from pk_entries_raw
+    select distinct client_id, tenant_name from pk_entries_raw
 
 ),
 
 pk_spine_combos as (
 
-    select d.date_day, c.client_id, c.tenant_name, c.game_id, c.game_name
+    select d.date_day, c.client_id, c.tenant_name
     from date_spine as d
     cross join pk_combos as c
 
@@ -69,11 +57,10 @@ pk_daily as (
     select
         date_day,
         tenant_name,
-        game_id,
         count(*) as entries,
         count(distinct user_id) as dau
     from pk_entries_raw
-    group by 1, 2, 3
+    group by 1, 2
 
 ),
 
@@ -82,14 +69,12 @@ pk_wau as (
     select
         sp.date_day,
         sp.tenant_name,
-        sp.game_id,
         count(distinct e.user_id) as wau
     from pk_spine_combos as sp
     left join pk_entries_raw as e
         on e.tenant_name = sp.tenant_name
-        and e.game_id = sp.game_id
         and e.date_day between dateadd(day, -6, sp.date_day) and sp.date_day
-    group by 1, 2, 3
+    group by 1, 2
 
 ),
 
@@ -98,37 +83,43 @@ pk_mau as (
     select
         sp.date_day,
         sp.tenant_name,
-        sp.game_id,
         count(distinct e.user_id) as mau
     from pk_spine_combos as sp
     left join pk_entries_raw as e
         on e.tenant_name = sp.tenant_name
-        and e.game_id = sp.game_id
         and e.date_day between dateadd(day, -27, sp.date_day) and sp.date_day
-    group by 1, 2, 3
+    group by 1, 2
 
 ),
 
 pk_first_entries as (
 
-    select date_day, tenant_name, game_id, count(distinct user_id) as first_entries
+    select date_day, tenant_name, count(distinct user_id) as first_entries
     from (
         select
             user_id,
             date_day,
             tenant_name,
-            game_id,
-            row_number() over (partition by user_id, game_id order by date_day) as rn
+            row_number() over (partition by user_id order by date_day) as rn
         from pk_entries_raw
     )
     where rn = 1
-    group by 1, 2, 3
+    group by 1, 2
 
 ),
 
--- Wallet deposits, treated as purchases for this table. A deposit tops up the wallet and
--- isn't tied to a specific contest_type, so it's computed per tenant only and joined onto
--- both the Spot the Ball and Raffle rows for that tenant/date (not split by game_id).
+pk_regs_raw as (
+
+    select
+        date_day,
+        tenant_name,
+        sum(new_registrations) as registrations
+    from {{ ref('agg_prizekings_comps__registration_metrics_daily') }}
+    group by 1, 2
+
+),
+
+-- Wallet deposits, treated as purchases for this table.
 pk_deposits_raw as (
 
     select
@@ -203,14 +194,14 @@ game_prizekings_comps as (
 
     select
         sp.date_day,
-        sp.game_id,
-        sp.game_name,
+        'prizekings_comps' as game_id,
+        'Prizekings' as game_name,
         'prize_competition' as game_type,
         'prizekings' as client_id,
         'adfprizekingsraffle' as source_schema,
         'low6_azureuksouth' as source_database,
         sp.tenant_name,
-        null::integer as registrations,
+        coalesce(reg.registrations, 0) as registrations,
         coalesce(d.entries, 0) as entries,
         coalesce(d.dau, 0) as dau,
         coalesce(w.wau, 0) as wau,
@@ -223,11 +214,12 @@ game_prizekings_comps as (
         coalesce(wp.wpu, 0) as wpu,
         coalesce(mp.mpu, 0) as mpu
     from pk_spine_combos as sp
-    left join pk_daily as d on sp.date_day = d.date_day and sp.tenant_name = d.tenant_name and sp.game_id = d.game_id
-    left join pk_wau as w on sp.date_day = w.date_day and sp.tenant_name = w.tenant_name and sp.game_id = w.game_id
-    left join pk_mau as m on sp.date_day = m.date_day and sp.tenant_name = m.tenant_name and sp.game_id = m.game_id
+    left join pk_daily as d on sp.date_day = d.date_day and sp.tenant_name = d.tenant_name
+    left join pk_wau as w on sp.date_day = w.date_day and sp.tenant_name = w.tenant_name
+    left join pk_mau as m on sp.date_day = m.date_day and sp.tenant_name = m.tenant_name
     left join pk_first_entries as fe
-        on sp.date_day = fe.date_day and sp.tenant_name = fe.tenant_name and sp.game_id = fe.game_id
+        on sp.date_day = fe.date_day and sp.tenant_name = fe.tenant_name
+    left join pk_regs_raw as reg on sp.date_day = reg.date_day and sp.tenant_name = reg.tenant_name
     left join pk_deposits_daily as dep on sp.date_day = dep.date_day and sp.tenant_name = dep.tenant_name
     left join pk_wpu as wp on sp.date_day = wp.date_day and sp.tenant_name = wp.tenant_name
     left join pk_mpu as mp on sp.date_day = mp.date_day and sp.tenant_name = mp.tenant_name
@@ -683,7 +675,8 @@ game_oddschecker_spintowin as (
 --------------------------------------------------------------------------------
 -- seven_days -- four distinct instant-win products under one domain, each its
 -- own game_id, multi-tenant by site. No registration source exists for this
--- domain (raw sources are sessions + games only) so registrations is null.
+-- domain (raw sources are sessions + games only), so registrations is proxied
+-- by first_entries (a user's first entry into that game/tenant).
 -- Test games (is_prod = false, surfaced as game_name = 'Test') are excluded.
 --------------------------------------------------------------------------------
 
@@ -866,7 +859,7 @@ game_seven_days as (
         'adf7days' as source_schema,
         'low6_azureuksouth' as source_database,
         sp.tenant_name,
-        null::integer as registrations,
+        coalesce(fe.first_entries, 0) as registrations,
         coalesce(d.entries, 0) as entries,
         coalesce(d.dau, 0) as dau,
         coalesce(w.wau, 0) as wau,
