@@ -45,6 +45,7 @@ select
     c.entry_fee,
     c.starts_at,
     c.ends_at,
+    c.updated_at,
     p.prize_type,
     p.prize_name,
     p.value as prize_value,

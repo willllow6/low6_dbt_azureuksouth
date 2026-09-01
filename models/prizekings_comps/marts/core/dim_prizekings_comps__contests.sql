@@ -30,7 +30,8 @@ joined as (
         contests.is_active,
         contests.entry_fee,
         contests.starts_at,
-        contests.ends_at
+        contests.ends_at,
+        contests.updated_at
     from contests
     left join titles
         on contests.contest_sk = titles.contest_sk

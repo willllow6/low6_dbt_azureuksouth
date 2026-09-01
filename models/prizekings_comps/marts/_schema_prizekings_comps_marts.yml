@@ -446,6 +446,24 @@ models:
       - name: client_id
         tests:
           - not_null
+      - name: tenant_id
+        tests:
+          - not_null
+      - name: game_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['prize_competition']
+
+  - name: shared_prizekings_comps__contest_performance
+    columns:
+      - name: contest_sk
+        tests:
+          - unique
+          - not_null
+      - name: client_id
+        tests:
+          - not_null
       - name: game_type
         tests:
           - not_null

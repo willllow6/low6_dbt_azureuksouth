@@ -20,6 +20,7 @@ contest_metrics as (
         contest_sk,
         client_id,
         game_type,
+        tenant_id,
         tenant_name,
         contest_name,
         contest_type,
@@ -27,6 +28,7 @@ contest_metrics as (
         entry_fee,
         starts_at,
         ends_at,
+        updated_at,
         count(*) as total_entry_count,
         sum(case when user_entry_number = 1 then 1 else 0 end) as first_user_entries,
         sum(case when prize_type in ('main', 'second') then 1 else 0 end) as tangible_prize_count,
@@ -36,7 +38,7 @@ contest_metrics as (
         coalesce(sum(case when prize_type = 'main' then prize_value else 0 end), 0) as main_prize_value,
         coalesce(sum(case when prize_type = 'second' then prize_value else 0 end), 0) as second_prize_value
     from entries
-    group by 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+    group by 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
 
 ),
 
@@ -46,6 +48,7 @@ add_financials as (
         c.contest_sk,
         c.client_id,
         c.game_type,
+        c.tenant_id,
         c.tenant_name,
         c.contest_name,
         c.contest_type,
@@ -53,6 +56,7 @@ add_financials as (
         c.entry_fee,
         c.starts_at,
         c.ends_at,
+        c.updated_at,
         c.total_entry_count,
         c.first_user_entries,
         c.tangible_prize_count,
@@ -79,6 +83,7 @@ select
     contest_sk,
     client_id,
     game_type,
+    tenant_id,
     tenant_name,
     contest_name,
     contest_type,
@@ -86,6 +91,7 @@ select
     entry_fee,
     starts_at,
     ends_at,
+    updated_at,
     total_entry_count,
     first_user_entries,
     paid_entry_count,
