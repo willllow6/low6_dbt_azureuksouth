@@ -17,7 +17,7 @@ tenants as (
 entry_metrics as (
 
     select
-        cast(convert_timezone('UTC', '{{ var("local_timezone") }}', entries.entered_at) as date) as date_day,
+        cast(entries.entered_at as date) as date_day,
         entries.client_id,
         entries.tenant_id,
         t.tenant_name,

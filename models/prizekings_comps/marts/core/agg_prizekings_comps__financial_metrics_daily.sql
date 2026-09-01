@@ -22,7 +22,10 @@ joined as (
         coalesce(ef.tenant_id, pa.tenant_id) as tenant_id,
         coalesce(ef.tenant_name, pa.tenant_name) as tenant_name,
         coalesce(ef.game_type, pa.game_type) as game_type,
-        'GBP' as currency,
+        case
+            when coalesce(ef.tenant_name, pa.tenant_name) = 'South Africa' then 'ZAR'
+            else 'GBP'
+        end as currency,
         coalesce(ef.gross_entry_revenue, 0) as gross_revenue,
         coalesce(pa.gross_prize_value, 0) as gross_prizes,
         coalesce(ef.gross_entry_revenue, 0) - coalesce(pa.gross_prize_value, 0) as gross_profit

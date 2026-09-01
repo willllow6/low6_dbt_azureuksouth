@@ -74,7 +74,11 @@ final as (
 
         ---------- metadata - simple deposits
         d.meta_data_json:checkoutId::string       as checkout_id,
-        d.meta_data_json:currency::string         as currency,
+        case
+            when d.payment_provider = 'mesh' then 'USDC'
+            when t.tenant_name = 'South Africa' then 'ZAR'
+            else 'GBP'
+        end as currency,
 
         ---------- metadata - bank/provider deposits
         d.meta_data_json:externalPaymentData:bankName::string        as bank_name,

@@ -89,6 +89,8 @@ renamed as (
                 then _quantity
             when _source = 'spot_the_ball_entry_balance'
                 then _picks_count
+            when _source = 'spot_the_ball_free_entry'
+                then _quantity
             else null
         end as entries,
         case
@@ -100,6 +102,8 @@ renamed as (
                 then _paid_entries
             when _source = 'spot_the_ball_entry_balance' and _paid_entries is null
                 then _picks_count
+            when _source = 'spot_the_ball_free_entry'
+                then 0
             else null
         end as paid_entries,
         case
@@ -111,6 +115,8 @@ renamed as (
                 then _free_entries
             when _source = 'spot_the_ball_entry_balance' and _free_entries is null
                 then 0
+            when _source = 'spot_the_ball_free_entry'
+                then _quantity
             else null
         end as free_entries,
         amount,

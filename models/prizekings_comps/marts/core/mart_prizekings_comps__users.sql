@@ -11,7 +11,7 @@ users as (
         last_name,
         mobile,
         email,
-        is_active,
+        is_enabled,
         created_at,
         updated_at
     from {{ ref('dim_prizekings_comps__users') }}
@@ -78,6 +78,26 @@ user_affiliates as (
 
 ),
 
+paid_activity as (
+
+    select
+        user_id,
+        boolor_agg(
+            cast(transaction_created_at as date) = dateadd(day, -1, cast(sysdate() as date))
+        ) as is_daily_active_user,
+        boolor_agg(
+            date_trunc('month', transaction_created_at) = date_trunc('month', sysdate())
+        ) as is_monthly_active_user,
+        boolor_agg(
+            date_trunc('year', transaction_created_at) = date_trunc('year', sysdate())
+        ) as is_yearly_active_user
+    from {{ ref('fct_prizekings_comps__entry_purchases') }}
+    where balance_type in ('deposit', 'site_credit')
+    and transaction_status = 'completed'
+    group by user_id
+
+),
+
 user_balances as (
 
     select
@@ -118,7 +138,11 @@ final as (
         coalesce(s.credit_spend, 0)         as credit_spend,
         coalesce(b.deposit_balance, 0)      as deposit_balance,
         coalesce(b.credit_balance, 0)       as credit_balance,
-        u.is_active,
+        u.is_enabled,
+        pa.user_id is not null                     as is_active_user,
+        coalesce(pa.is_daily_active_user, false)   as is_daily_active_user,
+        coalesce(pa.is_monthly_active_user, false) as is_monthly_active_user,
+        coalesce(pa.is_yearly_active_user, false)  as is_yearly_active_user,
         u.created_at,
         u.updated_at
     from users as u
@@ -130,6 +154,8 @@ final as (
         on u.user_id = s.user_id
     left join user_balances as b
         on u.user_id = b.user_id
+    left join paid_activity as pa
+        on u.user_id = pa.user_id
     left join tenants as t
         on u.tenant_id = t.tenant_id
     left join user_affiliates as ua

@@ -26,5 +26,10 @@ select
     credit_spend,
     deposit_balance,
     credit_balance,
-    updated_at
+    created_at,
+    updated_at,
+    is_active_user,
+    is_daily_active_user,
+    is_monthly_active_user,
+    is_yearly_active_user
 from users

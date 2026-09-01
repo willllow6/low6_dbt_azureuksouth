@@ -10,12 +10,12 @@ registrations as (
 daily_registrations as (
 
     select
-        cast(convert_timezone('UTC', '{{ var("local_timezone") }}', created_at) as date) as date_day,
+        cast(created_at as date) as date_day,
         client_id,
         game_type,
         tenant_name,
         roles,
-        is_active,
+        is_enabled,
         count(*) as registrations
     from registrations
     group by 1, 2, 3, 4, 5, 6

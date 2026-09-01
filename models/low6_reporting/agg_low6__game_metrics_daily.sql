@@ -31,7 +31,7 @@ pk_entries_raw as (
         e.user_id,
         e.client_id,
         t.tenant_name,
-        cast(convert_timezone('UTC', '{{ var("local_timezone") }}', e.entered_at) as date) as date_day
+        cast(e.entered_at as date) as date_day
     from {{ ref('fct_prizekings_comps__entries') }} as e
     inner join {{ ref('dim_prizekings_comps__tenants') }} as t
         on e.tenant_id = t.tenant_id
@@ -125,7 +125,7 @@ pk_deposits_raw as (
     select
         d.user_id,
         t.tenant_name,
-        cast(convert_timezone('UTC', '{{ var("local_timezone") }}', d.transaction_created_at) as date) as date_day,
+        cast(d.transaction_created_at as date) as date_day,
         d.amount as revenue
     from {{ ref('fct_prizekings_comps__deposits') }} as d
     inner join {{ ref('dim_prizekings_comps__tenants') }} as t

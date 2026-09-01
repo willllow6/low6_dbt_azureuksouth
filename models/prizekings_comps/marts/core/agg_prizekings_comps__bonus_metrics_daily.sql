@@ -42,7 +42,7 @@ promotions as (
 transaction_bonus_metrics as (
 
     select
-        cast(convert_timezone('UTC', '{{ var("local_timezone") }}', transactions.created_at) as date) as date_day,
+        cast(transactions.created_at as date) as date_day,
         transactions.client_id,
         users.tenant_id,
         t.tenant_name,
@@ -67,7 +67,7 @@ transaction_bonus_metrics as (
 ticket_bonus_metrics as (
 
     select
-        cast(convert_timezone('UTC', '{{ var("local_timezone") }}', user_promotions.completed_at) as date) as date_day,
+        cast(user_promotions.completed_at as date) as date_day,
         promotions.client_id,
         tenants.tenant_id,
         tenants.tenant_name,

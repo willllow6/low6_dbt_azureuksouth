@@ -24,7 +24,7 @@ tenants as (
 award_metrics as (
 
     select
-        cast(convert_timezone('UTC', '{{ var("local_timezone") }}', p.awarded_at) as date) as date_day,
+        cast(p.awarded_at as date) as date_day,
         p.client_id,
         c.tenant_id,
         t.tenant_name,

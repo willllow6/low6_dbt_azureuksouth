@@ -18,7 +18,7 @@ select
     mobile,
     roles,
     balance,
-    is_active,
+    is_active as is_enabled,
     created_at,
     updated_at
 from users

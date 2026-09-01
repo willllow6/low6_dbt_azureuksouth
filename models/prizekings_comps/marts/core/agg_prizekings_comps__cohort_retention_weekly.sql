@@ -28,7 +28,7 @@ user_cohorts as (
         u.client_id,
         u.tenant_id,
         u.game_type,
-        dateadd(day, -(dayofweek(convert_timezone('UTC', '{{ var("local_timezone") }}', u.created_at)) - 1), cast(convert_timezone('UTC', '{{ var("local_timezone") }}', u.created_at) as date)) as cohort_week
+        dateadd(day, -(dayofweek(u.created_at) - 1), cast(u.created_at as date)) as cohort_week
     from users as u
 
 ),
@@ -37,7 +37,7 @@ user_activity_weeks as (
 
     select
         e.user_id,
-        dateadd(day, -(dayofweek(convert_timezone('UTC', '{{ var("local_timezone") }}', e.entered_at)) - 1), cast(convert_timezone('UTC', '{{ var("local_timezone") }}', e.entered_at) as date)) as activity_week
+        dateadd(day, -(dayofweek(e.entered_at) - 1), cast(e.entered_at as date)) as activity_week
     from entries as e
     group by 1, 2
 

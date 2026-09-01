@@ -25,7 +25,7 @@ select
     u.mobile,
     u.roles,
     u.balance,
-    u.is_active,
+    u.is_enabled,
     t.tenant_name,
     u.created_at,
     u.updated_at

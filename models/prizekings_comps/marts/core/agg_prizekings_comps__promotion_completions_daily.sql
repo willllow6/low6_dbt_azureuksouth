@@ -10,7 +10,7 @@ base as (
 daily as (
 
     select
-        cast(convert_timezone('UTC', '{{ var("local_timezone") }}', completed_at) as date) as completed_date,
+        cast(completed_at as date) as completed_date,
         tenant_name,
         promotion_type,
         bonus_type,
