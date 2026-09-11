@@ -53,7 +53,7 @@ players as (
 
     select
         fantasy_player_id,
-        full_name,
+        match_name,
         fantasy_position,
         team_name,
         client_id,
@@ -83,7 +83,7 @@ enriched as (
         g.gameweek_name,
         g.starts_at,
         c.fantasy_player_id,
-        p.full_name,
+        p.match_name,
         p.fantasy_position,
         p.team_name,
         p.client_id,

@@ -18,13 +18,14 @@ player_scores as (
 selection_counts as (
 
     select
+        gameweek_id,
         fantasy_player_id,
         count(distinct fantasy_team_id) as times_selected,
         sum(case when is_starter then 1 else 0 end) as times_started,
         sum(case when is_captain then 1 else 0 end) as times_captained,
         sum(case when is_vice_captain then 1 else 0 end) as times_vice_captained
-    from {{ ref('fct_engagecraft_fantasy__selections') }}
-    group by 1
+    from {{ ref('fct_engagecraft_fantasy__gameweek_selections') }}
+    group by 1, 2
 
 ),
 
@@ -32,7 +33,7 @@ players as (
 
     select
         fantasy_player_id,
-        full_name,
+        match_name,
         fantasy_position,
         playing_position,
         team_name,
@@ -66,7 +67,7 @@ enriched as (
         g.gameweek_name,
         g.starts_at,
         ps.fantasy_player_id,
-        p.full_name,
+        p.match_name,
         p.fantasy_position,
         p.playing_position,
         p.team_name,
@@ -93,6 +94,7 @@ enriched as (
         on ps.gameweek_id = g.gameweek_id
     left join selection_counts as sc
         on ps.fantasy_player_id = sc.fantasy_player_id
+        and ps.gameweek_id = sc.gameweek_id
 
 )
 

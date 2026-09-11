@@ -43,6 +43,7 @@ enriched as (
         fp.tenant_name,
         fp.game_type,
         p.full_name,
+        p.match_name,
         p.first_name,
         p.last_name,
         p.playing_position,

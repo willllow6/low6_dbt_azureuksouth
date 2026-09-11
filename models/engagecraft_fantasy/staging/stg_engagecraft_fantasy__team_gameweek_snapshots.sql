@@ -31,6 +31,9 @@ renamed as (
         goals_scored,
         assists,
 
+        ---------- semi-structured
+        team_state,
+
         ---------- timestamps
         created_at::timestamp_ntz as created_at,
         updated_at::timestamp_ntz as updated_at

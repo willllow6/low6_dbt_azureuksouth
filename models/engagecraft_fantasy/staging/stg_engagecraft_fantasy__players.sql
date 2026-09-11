@@ -25,6 +25,7 @@ renamed as (
         first_name,
         last_name,
         first_name || ' ' || last_name as full_name,
+        match_name,
         position as playing_position,
         nationality,
         nationality_flag_key,

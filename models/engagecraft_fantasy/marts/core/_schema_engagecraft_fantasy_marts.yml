@@ -130,6 +130,7 @@ models:
           - accepted_values:
               values: ['GK', 'DEF', 'MID', 'FWD']
       - name: full_name
+      - name: match_name
         tests:
           - not_null
 
@@ -256,7 +257,7 @@ models:
           - accepted_values:
               values: ['fantasy']
 
-  - name: fct_engagecraft_fantasy__selections
+  - name: fct_engagecraft_fantasy__gameweek_selections
     columns:
       - name: selection_id
         tests:
@@ -268,6 +269,12 @@ models:
           - relationships:
               to: ref('dim_engagecraft_fantasy__fantasy_teams')
               field: fantasy_team_id
+      - name: gameweek_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_engagecraft_fantasy__gameweeks')
+              field: gameweek_id
       - name: fantasy_player_id
         tests:
           - not_null

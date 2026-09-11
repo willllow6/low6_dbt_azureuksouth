@@ -113,6 +113,7 @@ models:
           - accepted_values:
               values: ['fantasy']
       - name: full_name
+      - name: match_name
         tests:
           - not_null
 
@@ -195,30 +196,6 @@ models:
       - name: team_name
         tests:
           - not_null
-
-  - name: stg_engagecraft_fantasy__selections
-    columns:
-      - name: selection_id
-        tests:
-          - unique
-          - not_null
-      - name: fantasy_team_id
-        tests:
-          - not_null
-      - name: fantasy_player_id
-        tests:
-          - not_null
-      - name: client_id
-        tests:
-          - not_null
-      - name: tenant_id
-        tests:
-          - not_null
-      - name: game_type
-        tests:
-          - not_null
-          - accepted_values:
-              values: ['fantasy']
 
   - name: stg_engagecraft_fantasy__fantasy_team_transfers
     columns:

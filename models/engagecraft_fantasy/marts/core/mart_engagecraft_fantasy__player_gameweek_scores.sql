@@ -12,7 +12,7 @@ players as (
     select
         fantasy_player_id,
         player_id,
-        full_name,
+        match_name,
         fantasy_position,
         playing_position,
         team_name,
@@ -43,7 +43,7 @@ joined as (
         s.fantasy_player_id,
         s.gameweek_id,
         p.player_id,
-        p.full_name,
+        p.match_name,
         p.fantasy_position,
         p.playing_position,
         p.team_name,

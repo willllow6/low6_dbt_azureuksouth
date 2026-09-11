@@ -38,7 +38,7 @@ captain as (
 
     select
         fantasy_player_id,
-        full_name as captain_name
+        match_name as captain_name
     from {{ ref('dim_engagecraft_fantasy__players') }}
 
 ),
@@ -47,7 +47,7 @@ vice_captain as (
 
     select
         fantasy_player_id,
-        full_name as vice_captain_name
+        match_name as vice_captain_name
     from {{ ref('dim_engagecraft_fantasy__players') }}
 
 ),

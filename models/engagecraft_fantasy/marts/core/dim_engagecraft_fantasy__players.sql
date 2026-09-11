@@ -17,6 +17,7 @@ select
     tenant_name,
     game_type,
     full_name,
+    match_name,
     first_name,
     last_name,
     playing_position,
