@@ -9,7 +9,7 @@ applied_transfers as (
         player_in_id,
         player_out_id
     from {{ ref('fct_engagecraft_fantasy__transfers') }}
-    where transfer_status = 'applied'
+    where transfer_status in ('applied','pending')
 
 ),
 
