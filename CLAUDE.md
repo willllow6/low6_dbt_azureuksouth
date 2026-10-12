@@ -19,7 +19,8 @@ Snowflake region: Azure UK South. Shared conventions are in `~/.claude/CLAUDE.md
 - low6_reporting
 - pivot_bracket
 - prizekings_comps
+- seven_days
 
 ## Project Variables
-- `local_timezone: 'Europe/London'`
+- `local_timezone: 'Europe/London'` — local-time role columns use the suffix `_uk` (e.g. `entry_date_uk`)
 - `prizekings_start_date` — start date filter for prizekings_comps models

@@ -1,5 +1,5 @@
--- Grain change: session (purchase) → entry (one row per individual ticket play).
--- Flattens the ticket_array JSON from stg_seven_days__sessions into one row per entry.
+-- Grain change: session (purchase) → entry (one row per individual ticket).
+-- Flattens the ticket_array JSON from stg_seven_days__sessions.
 
 with
 
@@ -13,19 +13,19 @@ sessions as (
 entries as (
 
     select
+        t.value:id::string                                          as entry_id,
         s.session_id,
         s.user_id,
+        s.contest_id,
         s.game_id,
+        s.site_id,
         s.client_id,
         s.tenant_id,
         s.tenant_name,
         s.game_type,
-        s.site_id,
         s.url,
-        s.created_date                                              as session_date,
         s.created_at,
         t.index + 1                                                 as session_entry_number,
-        t.value:id::string                                          as entry_id,
         t.value:tier::int                                           as prize_tier,
         t.value:played::boolean                                     as is_played,
         t.value:prize:id::int                                       as prize_id,

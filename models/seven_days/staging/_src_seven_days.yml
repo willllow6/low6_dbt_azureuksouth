@@ -13,3 +13,12 @@ sources:
 
       - name: games
         identifier: game
+
+  - name: seven_days_prizes
+    description: 7 Days Performance prize lists from the API
+    database: low6_azureuksouth
+    schema: sevendaysprizes
+    tables:
+
+      - name: instance_prize_arrays
+        identifier: raw_instant_win_prizes

@@ -1,0 +1,21 @@
+version: 2
+
+seeds:
+
+  - name: seven_days_prize_values
+    description: >
+      One row per seven_days item prize name. Manually maintained GBP values for item prizes
+      (gold bars, tech, holidays) whose value isn't stated in the prize name. Matched to
+      dim_seven_days__prizes on upper(trim(prize_name)); a value parsed from the name wins.
+    config:
+      schema: seven_days
+      column_types:
+        prize_name: varchar
+        prize_value: number(12, 2)
+        currency: varchar
+        notes: varchar
+    columns:
+      - name: prize_name
+        tests:
+          - unique
+          - not_null

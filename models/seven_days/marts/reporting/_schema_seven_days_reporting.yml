@@ -1,0 +1,72 @@
+version: 2
+
+models:
+
+  - name: rpt_seven_days__contest_performance_summary
+    description: >
+      One row per game instance (contest × tenant). Sales and entrants plus the prize
+      structure for pricing analysis: ticket price, observed on-sale window, overall payout
+      odds, tier-1 prizes, and known RTP (theoretical from odds × value, realised from prizes
+      won). "Known" RTP covers valued prizes only; unvalued_win_probability /
+      unvalued_prizes_won show what is missing. "Estimated" RTP fills unvalued tiers from
+      rpt_seven_days__contest_prize_tier_summary; estimated_ev_share is the share of
+      estimated EV that comes from estimated tiers. Spend concentration uses each player's
+      total spend in the instance: top 1% / 10% of spenders, players needed for half of
+      revenue, big spenders / whales (vars seven_days_big_spender_threshold /
+      seven_days_whale_threshold) and the site's top-1% lifetime spenders playing it.
+      users_new_to_game / users_new_to_site count each player once, in the instance of their
+      first play of that game / on the site.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: [contest_id, tenant_id]
+
+  - name: rpt_seven_days__contest_prize_tier_summary
+    description: >
+      One row per game instance per prize tier. Tier odds, average prize value, expected value
+      per ticket, RTP contribution and expected vs actual wins. Prizes in a tier share the same
+      odds, so tier EV = tier_win_probability × tier_avg_prize_value. tier_value_basis: known /
+      partly_known (average of the valued prizes) / interpolated (sqrt of the nearest valued
+      tier-above min × tier-below max) / floor_from_tier_below (top tiers: tier-below max).
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: [contest_id, prize_tier]
+
+  - name: rpt_seven_days__prize_performance_summary
+    description: >
+      One row per prize per game instance. Odds, value, tier win probability, RTP
+      contribution, and expected vs actual wins.
+    columns:
+      - name: prize_id
+        tests:
+          - unique
+          - not_null
+
+  - name: rpt_seven_days__contest_lifecycle_daily
+    description: >
+      One row per game instance per UK day with sales, by days since the instance's first sale.
+      Revenue, payout and actual vs theoretical RTP; active / new / returning players (new =
+      first-ever site entry was in this instance, so it sums across rows); plays and spend per
+      player, average stake; D1/D7 site retention of first-time players of the instance,
+      second-play and repeat-purchase rates; win, small-win (prize value <= ticket price) and
+      tier-1 hit counts; median / p90 spend per player and top-1% revenue share. Definitions are
+      in the model header.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: [contest_id, activity_date_uk]
+
+exposures:
+
+  - name: seven_days_dashboards
+    label: 7 Days Performance dashboards
+    type: dashboard
+    owner:
+      name: Will Breeden
+      email: will@low6.co.uk
+    description: Tableau dashboards for 7 Days Performance / UKCC instant-win games.
+    depends_on:
+      - ref('rpt_seven_days__contest_performance_summary')
+      - ref('rpt_seven_days__prize_performance_summary')
+      - ref('rpt_seven_days__contest_prize_tier_summary')
+      - ref('rpt_seven_days__contest_lifecycle_daily')
+      - ref('agg_seven_days__entries_daily')
+      - ref('mart_seven_days__entries')

@@ -36,6 +36,8 @@ vars:
   oddschecker_spintowin_start_date: '2026-06-03'
   gaming1_start_date: '2026-07-24'
   local_timezone: 'Europe/London'
+  seven_days_big_spender_threshold: 100  # GBP spent by one player in one instance
+  seven_days_whale_threshold: 500
 
 on-run-start:
   - "{{ create_share('prizekings_share', ['KY17595']) }}"

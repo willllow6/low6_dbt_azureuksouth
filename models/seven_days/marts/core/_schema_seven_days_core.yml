@@ -1,0 +1,56 @@
+version: 2
+
+models:
+
+  - name: dim_seven_days__contests
+    description: >
+      One row per game instance (a game on one site, 1:1 with a raffle). contest_name is
+      'Test' for non-production games. starts_at is the first observed sale; ends_at is the
+      last observed sale, null while the instance is still selling (no on-sale dates exist in
+      the source). contest_status: 'test' (no ticket price or no entries), 'live' (entries
+      today, UK time), else 'closed'. Evaluated at query time (view).
+    columns:
+      - name: contest_id
+        tests:
+          - unique
+          - not_null
+
+  - name: dim_seven_days__prizes
+    description: >
+      One row per prize per game instance, from the raffle prize list. Odds are per ticket.
+      prize_value is parsed from the prize name ('£x', 'NNp') or taken from the
+      seven_days_prize_values seed, plus any extra cash; null when unknown (most items).
+      expected_value_per_ticket = prize_probability * prize_value.
+    columns:
+      - name: prize_id
+        tests:
+          - unique
+          - not_null
+
+  - name: fct_seven_days__entries
+    description: >
+      One row per entry (individual ticket). won_prize_* is the prize revealed on the
+      ticket; prize_id links it to dim_seven_days__prizes (matched on instance, name, tier
+      and odds). entry_fee is the instance ticket price.
+    columns:
+      - name: entry_id
+        tests:
+          - unique
+          - not_null
+
+  - name: fct_seven_days__purchases
+    description: >
+      One row per purchase (session), which buys one or more tickets.
+      purchase_price = tickets * ticket_price.
+    columns:
+      - name: purchase_id
+        tests:
+          - unique
+          - not_null
+
+  - name: fct_seven_days__user_activity_daily
+    description: >
+      One row per user per tenant per UK day with at least one entry.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: [user_id, tenant_id, activity_date_uk]

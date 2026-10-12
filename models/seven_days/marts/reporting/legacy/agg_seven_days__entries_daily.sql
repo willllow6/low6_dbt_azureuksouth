@@ -22,6 +22,7 @@ entry_metrics as (
         prize_name,
         prize_type,
         prize_odds,
+        ticket_price,
         count(*)                as entries,
         sum(
             case when user_entry_number = 1 then 1 else 0 end
@@ -29,7 +30,7 @@ entry_metrics as (
         count(prize_id)         as prizes,
         sum(ticket_price)       as total_sales
     from entries
-    group by 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
+    group by 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13
 
 )
 

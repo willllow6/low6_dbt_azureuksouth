@@ -1,0 +1,19 @@
+version: 2
+
+models:
+
+  - name: mart_seven_days__entries
+    description: >
+      One row per entry. Legacy compatibility view: the original wide entry table rebuilt
+      from fct_seven_days__entries + dim_seven_days__contests with the prod columns unchanged.
+      Read by low6_reporting; delete once those models are repointed.
+    columns:
+      - name: entry_id
+        tests:
+          - unique
+          - not_null
+
+  - name: agg_seven_days__entries_daily
+    description: >
+      One row per date × tenant × game × prize tier × played flag × won prize. Legacy daily
+      entry/prize metrics; delete once dashboards move to the rpt_seven_days__ models.
