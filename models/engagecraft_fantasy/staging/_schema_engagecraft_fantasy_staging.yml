@@ -375,3 +375,17 @@ models:
           - not_null
           - accepted_values:
               values: ['fantasy']
+
+  - name: stg_engagecraft_fantasy__dreamteam_game_registrations
+    description: >
+      One row per CPN per Dream Team game year, game type and tournament. Previous supplier's
+      (NUK Dream Team) 2025-26 game registrations, loaded once from
+      NUK_DREAMTEAM_GAMEREGISTRATION_20260601010504.csv. cpn matches users.ref_id.
+      The supplier file has 60 keys with 2+ rows (differing first_activity_date or exact
+      duplicates); consumers take distinct cpn.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: [cpn, dreamteam_game_year, dreamteam_game_type, dreamteam_tournament]
+          config:
+            warn_if: '>0'
+            error_if: '>60'

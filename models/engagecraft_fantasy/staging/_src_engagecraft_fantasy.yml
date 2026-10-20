@@ -24,3 +24,8 @@ sources:
       - name: fantasy_team_gameweek_snapshot
       - name: gameweek
       - name: gameweek_booster
+      - name: dreamteam_game_registration
+        description: >
+          One-off historical load of the previous supplier's (NUK Dream Team) 2025-26 game
+          registrations (NUK_DREAMTEAM_GAMEREGISTRATION_20260601010504.csv), loaded by
+          scripts/load_engagecraft_dreamteam_game_registrations.py. Not refreshed by ADF.
