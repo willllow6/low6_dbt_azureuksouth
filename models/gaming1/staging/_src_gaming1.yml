@@ -3,7 +3,10 @@ version: 2
 sources:
 
   - name: gaming1
-    description: gaming1 picks prod db
+    description: >
+      gaming1 prod db, a version of the caesars_supernova platform. Holds the picks game
+      (pickems, questions, options, user_selections) and the squads game (squads_* tables),
+      which share tenants and users.
     database: low6_azureuksouth
     schema: adfgaming1picks
     tags: ['gaming1']
@@ -20,3 +23,24 @@ sources:
       - name: user_selections
 
       - name: users
+
+      - name: squads_contests
+        description: Squads competitions the player cards are drawn from (e.g. Belgian Pro League). Not the canonical contest.
+
+      - name: squads_players
+        description: Footballers that can appear on the cards a squads user is shown, per competition.
+
+      - name: squads_round_days
+        description: Days within a squads round on which a user reveals cards and picks a player.
+
+      - name: squads_rounds
+        description: Squads rounds a user can enter. The canonical contest for squads.
+
+      - name: squads_user_rounds
+        description: A user's entry into a squads round.
+
+      - name: squads_user_slot_candidates
+        description: Cards shown to a user for a squads slot, and which one was selected.
+
+      - name: squads_user_slots
+        description: One slot per round day for each squads entry.

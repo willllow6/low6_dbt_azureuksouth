@@ -8,7 +8,9 @@ models:
       'Test' for non-production games. starts_at is the first observed sale; ends_at is the
       last observed sale, null while the instance is still selling (no on-sale dates exist in
       the source). contest_status: 'test' (no ticket price or no entries), 'live' (entries
-      today, UK time), else 'closed'. Evaluated at query time (view).
+      today, UK time), else 'closed'. game_name is the base game with the theme removed;
+      game_theme is 'Football' / 'Christmas', null for unthemed games. Evaluated at query
+      time (view).
     columns:
       - name: contest_id
         tests:
@@ -31,7 +33,9 @@ models:
     description: >
       One row per entry (individual ticket). won_prize_* is the prize revealed on the
       ticket; prize_id links it to dim_seven_days__prizes (matched on instance, name, tier
-      and odds). entry_fee is the instance ticket price.
+      and odds). won_prize_amount is the amount stated on the ticket (set for credit prizes,
+      null for cash/items). entry_fee is the instance ticket price. is_played is false on
+      ~98% of tickets and does not mean "revealed": don't build metrics on it.
     columns:
       - name: entry_id
         tests:
@@ -54,3 +58,15 @@ models:
     tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns: [user_id, tenant_id, activity_date_uk]
+
+  - name: dim_seven_days__users
+    description: >
+      One row per player per site (tenant), from production entries. No registration data
+      exists: registered_at is the first entry. Lifetime spend, purchases and credit won;
+      favourite game and main price tier by spend; spend_segment (whale / big_spender by
+      lifetime spend vs the threshold vars, regular = 2+ purchases, one_off); lifecycle_status
+      vs the current UK day (active <= 7 days, lapsing <= 28, lapsed) - lapsed from our games
+      only. Evaluated at query time (view).
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: [tenant_id, user_id]

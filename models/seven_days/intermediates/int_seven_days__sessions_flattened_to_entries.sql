@@ -32,6 +32,7 @@ entries as (
         t.value:prize:name::string                                  as prize_name,
         t.value:prize:type::string                                  as prize_type,
         t.value:prize:value::string                                 as prize_odds,
+        t.value:prize:amount::number(12, 2)                         as prize_amount,
         cast(
             regexp_substr(t.value:prize:value::string, '\\d+$') as int
         )                                                           as prize_odds_denominator,

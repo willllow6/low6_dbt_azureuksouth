@@ -54,6 +54,96 @@ models:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns: [contest_id, activity_date_uk]
 
+  - name: rpt_seven_days__entries_daily
+    description: >
+      One row per UK day × tenant × game × theme × ticket price (production instances only).
+      Entries, purchases and gross revenue, each split into new-to-site and new-to-game:
+      the player's first entry / purchase on the site / of the game, so new entries and new
+      purchases each equal new players; new revenue is that first purchase. price_tier is Low
+      (< £1) / High (>= £1); game_price_tier = game_name || ' - ' || price_tier. Replaces
+      agg_seven_days__entries_daily.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: [entry_date_uk, tenant_id, game_name, game_theme, ticket_price]
+
+  - name: rpt_seven_days__site_health_daily
+    description: >
+      One row per site (tenant) per UK day with sales. DAU/WAU/MAU, stickiness, new /
+      returning / reactivated players, revenue per player, incomplete purchases, known and
+      estimated payout, net revenue, actual RTP and trailing 7/28-day averages. Definitions
+      are in the model header.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: [tenant_id, entry_date_uk]
+
+  - name: rpt_seven_days__cohort_retention_weekly
+    description: >
+      One row per site (tenant) per first-entry cohort week per activity week. Standard
+      cohort retention plus cohort revenue and cumulative (net) revenue per cohort player
+      for LTV curves.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: [tenant_id, cohort_week, activity_week]
+
+  - name: rpt_seven_days__player_growth_accounting_weekly
+    description: >
+      One row per site (tenant) per UK week. Active players and revenue split into new,
+      retained and reactivated; churned players and revenue; expansion / contraction of
+      retained players' spend; quick ratio.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: [tenant_id, activity_week]
+
+  - name: rpt_seven_days__post_outcome_behaviour_daily
+    description: >
+      One row per site (tenant) per UK day per game per price tier per purchase outcome
+      (credit_win / other_win / no_win). Rebuy within 1h / 24h, same-game rebuy, median
+      minutes to the next purchase and credit won vs next-purchase value.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: [tenant_id, purchase_date_uk, game_name, price_tier, purchase_outcome]
+
+  - name: rpt_seven_days__price_point_summary_monthly
+    description: >
+      One row per site (tenant) per UK month per game per theme per ticket price, across
+      instances. Players, new players and their 7-day return rate, revenue per player,
+      tickets per purchase, known payout, RTP and net revenue.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: [tenant_id, activity_month, game_name, game_theme, ticket_price]
+
+  - name: rpt_seven_days__price_tier_migration_monthly
+    description: >
+      One row per site (tenant) per UK month per previous main price tier per main price
+      tier. Players trading up / down between Low (< £1) and High (>= £1) month to month.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: [tenant_id, activity_month, previous_main_price_tier, main_price_tier]
+
+  - name: rpt_seven_days__basket_size_summary_monthly
+    description: >
+      One row per site (tenant) per UK month per game per price tier per basket size band
+      (tickets per purchase). Purchases, players, revenue and share of revenue.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: [tenant_id, activity_month, game_name, price_tier, basket_size_band]
+
+  - name: rpt_seven_days__activity_heatmap_weekly
+    description: >
+      One row per site (tenant) per UK week per UK day of week per UK hour with purchases.
+      Players, purchases, entries and revenue.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: [tenant_id, activity_week, day_of_week, hour_of_day]
+
+  - name: rpt_seven_days__game_crossplay_summary
+    description: >
+      One row per site (tenant) per game per other game. Players of the game who also played
+      the other game, and which they played first.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: [tenant_id, game_name, other_game_name]
+
 exposures:
 
   - name: seven_days_dashboards
@@ -68,5 +158,16 @@ exposures:
       - ref('rpt_seven_days__prize_performance_summary')
       - ref('rpt_seven_days__contest_prize_tier_summary')
       - ref('rpt_seven_days__contest_lifecycle_daily')
+      - ref('rpt_seven_days__entries_daily')
+      - ref('rpt_seven_days__site_health_daily')
+      - ref('rpt_seven_days__cohort_retention_weekly')
+      - ref('rpt_seven_days__player_growth_accounting_weekly')
+      - ref('rpt_seven_days__post_outcome_behaviour_daily')
+      - ref('rpt_seven_days__price_point_summary_monthly')
+      - ref('rpt_seven_days__price_tier_migration_monthly')
+      - ref('rpt_seven_days__basket_size_summary_monthly')
+      - ref('rpt_seven_days__activity_heatmap_weekly')
+      - ref('rpt_seven_days__game_crossplay_summary')
+      - ref('dim_seven_days__users')
       - ref('agg_seven_days__entries_daily')
       - ref('mart_seven_days__entries')

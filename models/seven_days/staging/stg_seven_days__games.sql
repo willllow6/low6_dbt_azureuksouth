@@ -36,7 +36,21 @@ renamed as (
                 0,
                 'i'
             )
+        )                       as contest_name,
+        trim(
+            regexp_replace(
+                name,
+                '\\s*-\\s*|\\s*(christmas|football)\\s*',
+                ' ',
+                1,
+                0,
+                'i'
+            )
         )                       as game_name,
+        case
+            when name ilike '%football%'    then 'Football'
+            when name ilike '%christmas%'   then 'Christmas'
+        end                     as game_theme,
         'GBP'                   as currency,
 
         -- numerics

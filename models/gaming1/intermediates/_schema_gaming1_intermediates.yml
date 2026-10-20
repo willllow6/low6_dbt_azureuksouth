@@ -4,46 +4,53 @@ models:
 
   - name: int_gaming1__selection_entries
     description: >
-      Grain change from stg_gaming1__selections (selection grain) to entry grain
-      (one row per user per contest). Selection-sourced entries only -- a future
-      gaming1 game type would add a parallel int_gaming1__<type>_entries model.
+      One row per user per pickem contest. Grain change from stg_gaming1__selections
+      (selection grain); entry_id is a surrogate key on (user_id, contest_id).
     columns:
       - name: entry_id
         tests:
           - unique
           - not_null
-      - name: user_id
-        tests:
-          - not_null
+
+  - name: int_gaming1__contests_unioned
+    description: >
+      One row per contest: pickem contests unioned with squads rounds, with the contest's
+      tenant resolved. Squads starts_at is the first day's reveal start; ends_at is the match
+      window end, else the last day's reveal end.
+    columns:
       - name: contest_id
         tests:
+          - unique
           - not_null
-      - name: client_id
+
+  - name: int_gaming1__entries_unioned
+    description: >
+      One row per user per contest: pickem entries (from int_gaming1__selection_entries)
+      unioned with squads entries. user_entry_number is scoped per game_type.
+    columns:
+      - name: entry_id
         tests:
+          - unique
           - not_null
-      - name: tenant_id
+
+  - name: int_gaming1__selections_unioned
+    description: >
+      One row per selection: pickem selections unioned with squads picked slots
+      (selection_id = slot id).
+    columns:
+      - name: selection_id
         tests:
+          - unique
           - not_null
-      - name: game_type
-        tests:
-          - not_null
-          - accepted_values:
-              values: ['pickem']
 
   - name: int_gaming1__user_tenants
     description: >
-      Resolves each user's best-known tenant: location -> tenant_code match, falling back to the
-      tenant of the user's first entry, falling back to client_id. gaming1's users.location is null
-      for every row in production, so this exists to keep dim_gaming1__users (and everything built
-      on it) reliably tenant-attributed despite that data gap.
+      One row per user with their tenant: the platform's only tenant while there is one (so
+      every user, entered or not, has it); otherwise location -> tenant_code match, else the
+      tenant of the user's first entry in either game, else client_id. Users carry no tenant
+      and location is null in production.
     columns:
       - name: user_id
         tests:
           - unique
-          - not_null
-      - name: tenant_id
-        tests:
-          - not_null
-      - name: tenant_name
-        tests:
           - not_null

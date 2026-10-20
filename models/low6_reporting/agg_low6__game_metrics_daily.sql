@@ -1105,48 +1105,71 @@ game_itv_spinoff_live as (
 ),
 
 --------------------------------------------------------------------------------
--- gaming1 (pickem, multi-tenant)
+-- gaming1 (pickem + squads, multi-tenant): one game_id split by game_type
+-- dau/wau/mau count users active in that game on the day (entered or picked; squads
+-- also revealed cards). One account covers both games, so registrations are game-level:
+-- they stay on the pickem row (continuing the existing series) and are null for squads.
+-- game_id / game_name / source_schema are unchanged so the existing series continues.
 --------------------------------------------------------------------------------
 
--- tenant_name is resolved via e.tenant_id -> dim_gaming1__tenants (the contest's tenant), not from
--- dim_gaming1__users: gaming1's users.location is null for every row in production, so a user's
--- tenant can't be resolved off the user record alone. Registrations reuse
--- agg_gaming1__registration_metrics_daily's per-tenant resolution (via each user's first entry).
+g1_activity_raw as (
+
+    select
+        user_id,
+        game_type,
+        coalesce(tenant_name, client_id) as tenant_name,
+        activity_date_uk as date_day
+    from {{ ref('fct_gaming1__user_activity_daily') }}
+
+),
+
 g1_entries_raw as (
 
     select
-        e.user_id,
-        coalesce(t.tenant_name, e.client_id) as tenant_name,
-        cast(convert_timezone('UTC', '{{ var("local_timezone") }}', e.entered_at) as date) as date_day
-    from {{ ref('fct_gaming1__entries') }} as e
-    left join {{ ref('dim_gaming1__tenants') }} as t
-        on e.tenant_id = t.tenant_id
+        user_id,
+        game_type,
+        coalesce(tenant_name, client_id) as tenant_name,
+        user_entry_number,
+        entry_date_uk as date_day
+    from {{ ref('fct_gaming1__entries') }}
 
 ),
 
 g1_combos as (
 
-    select distinct tenant_name from g1_entries_raw
+    select game_type, tenant_name, min(date_day) as first_date_day
+    from g1_activity_raw
+    group by 1, 2
 
 ),
 
 g1_spine_combos as (
 
-    select d.date_day, c.tenant_name
+    select d.date_day, c.game_type, c.tenant_name
     from date_spine as d
-    cross join g1_combos as c
+    inner join g1_combos as c
+        on d.date_day >= c.first_date_day
+
+),
+
+g1_entries_daily as (
+
+    select
+        date_day,
+        game_type,
+        tenant_name,
+        count(*) as entries,
+        count_if(user_entry_number = 1) as first_entries
+    from g1_entries_raw
+    group by 1, 2, 3
 
 ),
 
 g1_daily as (
 
-    select
-        date_day,
-        tenant_name,
-        count(*) as entries,
-        count(distinct user_id) as dau
-    from g1_entries_raw
-    group by 1, 2
+    select date_day, game_type, tenant_name, count(distinct user_id) as dau
+    from g1_activity_raw
+    group by 1, 2, 3
 
 ),
 
@@ -1154,13 +1177,15 @@ g1_wau as (
 
     select
         sp.date_day,
+        sp.game_type,
         sp.tenant_name,
-        count(distinct e.user_id) as wau
+        count(distinct a.user_id) as wau
     from g1_spine_combos as sp
-    left join g1_entries_raw as e
-        on e.tenant_name = sp.tenant_name
-        and e.date_day between dateadd(day, -6, sp.date_day) and sp.date_day
-    group by 1, 2
+    left join g1_activity_raw as a
+        on a.game_type = sp.game_type
+        and a.tenant_name = sp.tenant_name
+        and a.date_day between dateadd(day, -6, sp.date_day) and sp.date_day
+    group by 1, 2, 3
 
 ),
 
@@ -1168,40 +1193,27 @@ g1_mau as (
 
     select
         sp.date_day,
+        sp.game_type,
         sp.tenant_name,
-        count(distinct e.user_id) as mau
+        count(distinct a.user_id) as mau
     from g1_spine_combos as sp
-    left join g1_entries_raw as e
-        on e.tenant_name = sp.tenant_name
-        and e.date_day between dateadd(day, -27, sp.date_day) and sp.date_day
-    group by 1, 2
-
-),
-
-g1_first_entries as (
-
-    select date_day, tenant_name, count(distinct user_id) as first_entries
-    from (
-        select
-            user_id,
-            date_day,
-            tenant_name,
-            row_number() over (partition by user_id order by date_day) as rn
-        from g1_entries_raw
-    )
-    where rn = 1
-    group by 1, 2
+    left join g1_activity_raw as a
+        on a.game_type = sp.game_type
+        and a.tenant_name = sp.tenant_name
+        and a.date_day between dateadd(day, -27, sp.date_day) and sp.date_day
+    group by 1, 2, 3
 
 ),
 
 g1_regs as (
 
     select
-        date_day,
+        registered_date_uk as date_day,
+        game_type,
         tenant_name,
-        sum(new_registrations) as registrations
-    from {{ ref('agg_gaming1__registration_metrics_daily') }}
-    group by 1, 2
+        count(*) as registrations
+    from {{ ref('dim_gaming1__users') }}
+    group by 1, 2, 3
 
 ),
 
@@ -1211,17 +1223,17 @@ game_gaming1 as (
         sp.date_day,
         'gaming1' as game_id,
         'Gaming1' as game_name,
-        'pickem' as game_type,
+        sp.game_type,
         'gaming1' as client_id,
         'adfgaming1picks' as source_schema,
         'low6_azureuksouth' as source_database,
         sp.tenant_name,
-        coalesce(r.registrations, 0) as registrations,
-        coalesce(d.entries, 0) as entries,
+        case when sp.game_type = 'pickem' then coalesce(r.registrations, 0) end as registrations,
+        coalesce(e.entries, 0) as entries,
         coalesce(d.dau, 0) as dau,
         coalesce(w.wau, 0) as wau,
         coalesce(m.mau, 0) as mau,
-        coalesce(fe.first_entries, 0) as first_entries,
+        coalesce(e.first_entries, 0) as first_entries,
         null::integer as purchases,
         null::number as gross_revenue,
         null::integer as dpu,
@@ -1229,12 +1241,16 @@ game_gaming1 as (
         null::integer as wpu,
         null::integer as mpu
     from g1_spine_combos as sp
-    left join g1_daily as d on sp.date_day = d.date_day and sp.tenant_name = d.tenant_name
-    left join g1_wau as w on sp.date_day = w.date_day and sp.tenant_name = w.tenant_name
-    left join g1_mau as m on sp.date_day = m.date_day and sp.tenant_name = m.tenant_name
-    left join g1_first_entries as fe on sp.date_day = fe.date_day and sp.tenant_name = fe.tenant_name
-    left join g1_regs as r on sp.date_day = r.date_day and sp.tenant_name = r.tenant_name
-    where sp.date_day >= (select min(date_day) from g1_entries_raw)
+    left join g1_entries_daily as e
+        on sp.date_day = e.date_day and sp.game_type = e.game_type and sp.tenant_name = e.tenant_name
+    left join g1_daily as d
+        on sp.date_day = d.date_day and sp.game_type = d.game_type and sp.tenant_name = d.tenant_name
+    left join g1_wau as w
+        on sp.date_day = w.date_day and sp.game_type = w.game_type and sp.tenant_name = w.tenant_name
+    left join g1_mau as m
+        on sp.date_day = m.date_day and sp.game_type = m.game_type and sp.tenant_name = m.tenant_name
+    left join g1_regs as r
+        on sp.date_day = r.date_day and sp.game_type = r.game_type and sp.tenant_name = r.tenant_name
 
 )
 

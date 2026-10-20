@@ -5,7 +5,9 @@
 --                        on this day (each player is new exactly once, so this sums across rows)
 --   returning_players    active players who had already played on the site (any game, any earlier
 --                        time, including another instance earlier the same day)
---   new_to_game_players  first play of this game name (any instance / price) on the site
+--   new_to_game_players  the player's first play of this game (game_name: any theme, instance or
+--                        price) on the site was in this instance on this day; each player is new
+--                        to each game once, so this sums across rows
 --   d1 / d7_retention    of players playing this instance for the first time that day, share
 --                        active on the site (any game) 1 / 7 days later; null until mature
 --   second_play_rate     of new_players, share who made a second purchase on the site (ever)
@@ -65,7 +67,7 @@ prod_entries as (
         e.contest_id,
         e.tenant_id,
         e.user_id,
-        c.contest_name,
+        c.game_name,
         e.entry_date_uk                                     as activity_date_uk,
         e.entered_at,
         e.purchase_id,
@@ -93,7 +95,7 @@ player_day as (
         contest_id,
         tenant_id,
         user_id,
-        contest_name,
+        game_name,
         activity_date_uk,
         min(entered_at)                                     as first_entered_at,
         count(*)                                            as entries,
@@ -128,9 +130,10 @@ player_flags as (
         d.*,
         d.contest_id = s.site_first_contest_id
             and d.activity_date_uk = s.site_first_date      as is_new_to_site,
-        d.activity_date_uk = min(d.activity_date_uk) over (
-            partition by d.tenant_id, d.user_id, d.contest_name
-        )                                                   as is_new_to_game,
+        row_number() over (
+            partition by d.tenant_id, d.user_id, d.game_name
+            order by d.first_entered_at, d.contest_id
+        ) = 1                                               as is_new_to_game,
         d.activity_date_uk = min(d.activity_date_uk) over (
             partition by d.contest_id, d.user_id
         )                                                   as is_new_to_contest,

@@ -40,7 +40,8 @@ entry_grain as (
         game_type,
         sum(points) as total_points,
         max(tiebreaker_prediction) as tiebreaker_prediction,
-        min(selected_at) as entered_at
+        min(selected_at) as entered_at,
+        max(updated_at) as updated_at
     from selections
     group by
         user_id,
@@ -61,6 +62,7 @@ with_entry_number as (
         total_points,
         tiebreaker_prediction,
         entered_at,
+        updated_at,
         row_number() over (
             partition by user_id
             order by entered_at
@@ -82,6 +84,7 @@ with_context as (
         entries.tiebreaker_prediction,
         tiebreakers.tiebreaker_outcome,
         entries.entered_at,
+        entries.updated_at,
         entries.entry_number,
         null::boolean as is_winner  -- TODO: derive from leaderboard once results are scored
     from with_entry_number as entries

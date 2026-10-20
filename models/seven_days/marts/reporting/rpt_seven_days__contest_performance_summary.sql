@@ -75,7 +75,7 @@ player_contest as (
         e.contest_id,
         e.tenant_id,
         e.user_id,
-        c.contest_name,
+        c.game_name,
         min(e.entered_at)                                   as first_entered_at,
         sum(e.entry_fee)                                    as spend
     from entries as e
@@ -100,7 +100,7 @@ player_ranked as (
             rows between unbounded preceding and current row
         )                                                   as cumulative_spend,
         contest_id = first_value(contest_id) over (
-            partition by tenant_id, user_id, contest_name order by first_entered_at, contest_id
+            partition by tenant_id, user_id, game_name order by first_entered_at, contest_id
         )                                                   as is_new_to_game,
         contest_id = first_value(contest_id) over (
             partition by tenant_id, user_id order by first_entered_at, contest_id
@@ -239,9 +239,17 @@ final as (
         coalesce(e.first_time_entrants, 0)                  as first_time_entrants,
         coalesce(e.paid_out_entries, 0)                     as paid_out_entries,
 
+        -- game
+        c.game_name,
+        c.game_theme,
+
         -- pricing and sales
         c.raffle_id,
         c.ticket_price,
+        case
+            when c.ticket_price < 1     then 'Low'
+            when c.ticket_price >= 1    then 'High'
+        end                                                 as price_tier,
         c.currency,
         c.starts_at                                         as on_sale_start_at,
         c.ends_at                                           as on_sale_end_at,

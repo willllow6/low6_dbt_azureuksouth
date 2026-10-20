@@ -16,4 +16,4 @@ models:
   - name: agg_seven_days__entries_daily
     description: >
       One row per date × tenant × game × prize tier × played flag × won prize. Legacy daily
-      entry/prize metrics; delete once dashboards move to the rpt_seven_days__ models.
+      entry/prize metrics; delete once dashboards move to rpt_seven_days__entries_daily.

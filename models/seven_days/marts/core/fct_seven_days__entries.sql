@@ -64,6 +64,7 @@ final as (
         e.prize_id                                  as won_prize_ticket_id,
         e.prize_name                                as won_prize_name,
         e.prize_type                                as won_prize_type,
+        e.prize_amount                              as won_prize_amount,
         e.prize_odds                                as won_prize_odds,
         e.prize_odds_denominator                    as won_prize_odds_denominator,
         e.prize_probability                         as won_prize_probability,

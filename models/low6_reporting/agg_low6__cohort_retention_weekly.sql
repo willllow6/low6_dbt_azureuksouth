@@ -566,37 +566,36 @@ game_itv_spinoff_live as (
 ),
 
 --------------------------------------------------------------------------------
--- gaming1 (pickem, multi-tenant)
+-- gaming1 (pickem + squads, multi-tenant): one game_id split by game_type
+-- Cohort = first-entry week per game; retained = entered in that week (entries only, as
+-- for the other games in this table). game_id / game_name / source_schema are unchanged
+-- so the existing pickem series continues.
 --------------------------------------------------------------------------------
 
--- tenant_name is resolved via e.tenant_id -> dim_gaming1__tenants (the contest's tenant), not from
--- dim_gaming1__users: gaming1's users.location is null for every row in production, so a user's
--- tenant can't be resolved off the user record alone.
 g1_entries as (
 
     select
-        e.user_id,
-        coalesce(t.tenant_name, e.client_id) as tenant_name,
-        date_trunc('week', cast(convert_timezone('UTC', 'America/New_York', e.entered_at) as date)) as activity_week
-    from {{ ref('fct_gaming1__entries') }} as e
-    left join {{ ref('dim_gaming1__tenants') }} as t
-        on e.tenant_id = t.tenant_id
+        user_id,
+        game_type,
+        coalesce(tenant_name, client_id) as tenant_name,
+        date_trunc('week', cast(convert_timezone('UTC', 'America/New_York', entered_at) as date)) as activity_week
+    from {{ ref('fct_gaming1__entries') }}
 
 ),
 
 g1_cohort_weeks as (
 
-    select user_id, tenant_name, min(activity_week) as cohort_week
+    select user_id, game_type, tenant_name, min(activity_week) as cohort_week
     from g1_entries
-    group by 1, 2
+    group by 1, 2, 3
 
 ),
 
 g1_cohort_sizes as (
 
-    select cohort_week, tenant_name, count(distinct user_id) as cohort_size
+    select cohort_week, game_type, tenant_name, count(distinct user_id) as cohort_size
     from g1_cohort_weeks
-    group by 1, 2
+    group by 1, 2, 3
 
 ),
 
@@ -604,6 +603,7 @@ g1_user_activity as (
 
     select
         e.user_id,
+        cw.game_type,
         cw.tenant_name,
         cw.cohort_week,
         e.activity_week,
@@ -611,6 +611,7 @@ g1_user_activity as (
     from g1_entries as e
     inner join g1_cohort_weeks as cw
         on e.user_id = cw.user_id
+        and e.game_type = cw.game_type
         and e.tenant_name = cw.tenant_name
 
 ),
@@ -620,7 +621,7 @@ game_gaming1 as (
     select
         'gaming1' as game_id,
         'Gaming1' as game_name,
-        'pickem' as game_type,
+        ua.game_type,
         'gaming1' as client_id,
         'adfgaming1picks' as source_schema,
         'low6_azureuksouth' as source_database,
@@ -634,6 +635,7 @@ game_gaming1 as (
     from g1_user_activity as ua
     inner join g1_cohort_sizes as cs
         on ua.cohort_week = cs.cohort_week
+        and ua.game_type = cs.game_type
         and ua.tenant_name = cs.tenant_name
     group by 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, cs.cohort_size
 

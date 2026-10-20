@@ -25,6 +25,7 @@ models:
                 - instant_win
                 - daily_quiz
                 - live_quiz
+                - squads
       - name: "date_day || '-' || game_id || '-' || game_type || '-' || coalesce(tenant_name, 'null')"
         tests:
           - unique
@@ -55,6 +56,7 @@ models:
                 - instant_win
                 - daily_quiz
                 - live_quiz
+                - squads
 
   - name: agg_low6__all_game_metrics_daily
     description: >

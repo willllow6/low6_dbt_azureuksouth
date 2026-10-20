@@ -1,0 +1,98 @@
+version: 2
+
+models:
+
+  - name: dim_gaming1__tenants
+    description: One row per tenant. Shared by the picks and squads games.
+    columns:
+      - name: tenant_id
+        tests:
+          - unique
+          - not_null
+
+  - name: dim_gaming1__users
+    description: >
+      One row per user. One account covers every gaming1 game; every user is attributed to
+      pickem (game_type = 'pickem'). tenant is the platform's only tenant while there is one,
+      else location, else the user's first entry in either game, else client_id.
+    columns:
+      - name: user_id
+        tests:
+          - unique
+          - not_null
+
+  - name: dim_gaming1__contests
+    description: >
+      One row per contest: pickem contests and squads rounds. Game-specific attributes are null
+      for the other game. Squads starts_at is the first day's reveal start; ends_at is the match
+      window end, else the last day's reveal end (null for pickem).
+    columns:
+      - name: contest_id
+        tests:
+          - unique
+          - not_null
+
+  - name: dim_gaming1__questions
+    description: One row per question in a pickem contest.
+    columns:
+      - name: question_id
+        tests:
+          - unique
+          - not_null
+
+  - name: dim_gaming1__squads_contest_days
+    description: >
+      One row per squads round day. A day's reveal window opens at reveal_starts_at and stays
+      open until the round ends, so users can catch up on missed days.
+    columns:
+      - name: contest_day_id
+        tests:
+          - unique
+          - not_null
+
+  - name: dim_gaming1__squads_players
+    description: One row per footballer per competition that can appear on a squads card.
+    columns:
+      - name: player_id
+        tests:
+          - unique
+          - not_null
+
+  - name: fct_gaming1__entries
+    description: >
+      One row per user per contest, for both games. Pickem entries are aggregated from
+      selections (entry_id = user_id-contest_id); squads entries are native. user_entry_number
+      is the user's nth entry in that game_type; user_platform_entry_number is their nth entry
+      across every gaming1 game. Squads is_winner is null until scored, then true when the entry
+      has a prize_id (no prizes table in the source yet); pickem is_winner is not yet derived.
+    columns:
+      - name: entry_id
+        tests:
+          - unique
+          - not_null
+
+  - name: fct_gaming1__selections
+    description: >
+      One row per selection: a pickem answer, or a squads slot with a player picked
+      (selection_id = slot id). Game-specific columns are null for the other game.
+    columns:
+      - name: selection_id
+        tests:
+          - unique
+          - not_null
+
+  - name: fct_gaming1__squads_card_reveals
+    description: One row per card shown to a user for a squads slot, whether or not it was picked.
+    columns:
+      - name: card_reveal_id
+        tests:
+          - unique
+          - not_null
+
+  - name: fct_gaming1__user_activity_daily
+    description: >
+      One row per user per tenant per game_type per UK day on which the user entered a contest,
+      made a pick, or (squads) revealed a day's cards.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: [user_id, tenant_id, game_type, activity_date_uk]

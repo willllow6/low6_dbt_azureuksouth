@@ -1,0 +1,35 @@
+version: 2
+
+models:
+
+  - name: rpt_gaming1__growth_metrics_daily
+    description: >
+      One row per UK day per client × tenant × game_type, from the game's first activity day to
+      today. dau/wau/mau count users who entered or picked (squads: also revealed). One account
+      covers both games and every user is attributed to pickem, so all registrations are on the
+      pickem row and null on squads. first_platform_entries = first entry in any gaming1 game.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: [date_day, client_id, tenant_id, game_type]
+
+  - name: rpt_gaming1__cohort_retention_weekly
+    description: >
+      One row per first-entry cohort week per activity week per tenant × game_type (UK weeks).
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: [cohort_week, activity_week, client_id, tenant_id, game_type]
+
+  - name: rpt_gaming1__contest_performance_summary
+    description: One row per contest (contest × tenant), both games.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: [contest_id, tenant_id]
+
+  - name: rpt_gaming1__squads_contest_retention_by_day_index
+    description: >
+      Squads only. One row per contest per cohort day index (contest day in progress at entry)
+      per activity day index (contest day in progress when a pick was made). retained_users =
+      cohort users who picked during that contest day. Only days already opened are included.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: [contest_id, cohort_day_index, activity_day_index]

@@ -15,6 +15,7 @@ Snowflake region: Azure UK South. Shared conventions are in `~/.claude/CLAUDE.md
 
 ## Domains
 - core_user_service
+- gaming1 (picks + squads)
 - itv_spinoff
 - low6_reporting
 - pivot_bracket
@@ -24,3 +25,4 @@ Snowflake region: Azure UK South. Shared conventions are in `~/.claude/CLAUDE.md
 ## Project Variables
 - `local_timezone: 'Europe/London'` — local-time role columns use the suffix `_uk` (e.g. `entry_date_uk`)
 - `prizekings_start_date` — start date filter for prizekings_comps models
+- `gaming1_start_date` — date spine start for gaming1 reporting models

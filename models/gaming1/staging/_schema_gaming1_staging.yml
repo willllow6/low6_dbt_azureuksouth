@@ -2,113 +2,114 @@ version: 2
 
 models:
 
-  - name: stg_gaming1__tenants
-    description: Tenant partitions for the gaming1 picks game.
-    columns:
-      - name: tenant_id
-        tests:
-          - unique
-          - not_null
-      - name: client_id
-        tests:
-          - not_null
-      - name: tenant_code
-        tests:
-          - unique
-          - not_null
-      - name: tenant_name
-        tests:
-          - not_null
+  # shared by picks and squads
 
-  - name: stg_gaming1__contests
-    description: Pickem contests (pickems) for the gaming1 picks game.
+  - name: stg_gaming1__tenants
+    description: One row per tenant. Shared by the picks and squads games.
     columns:
-      - name: contest_id
-        tests:
-          - unique
-          - not_null
       - name: tenant_id
         tests:
-          - not_null
-      - name: client_id
-        tests:
-          - not_null
-      - name: game_type
-        tests:
-          - not_null
-          - accepted_values:
-              values: ['pickem']
-      - name: contest_status
-        tests:
+          - unique
           - not_null
 
   - name: stg_gaming1__users
-    description: Registered users in the gaming1 picks game.
+    description: >
+      One row per user. One account covers every gaming1 game; every user is attributed to
+      pickem (game_type = 'pickem').
     columns:
       - name: user_id
         tests:
           - unique
           - not_null
-      - name: client_id
+
+  # picks (pickem)
+
+  - name: stg_gaming1__contests
+    description: One row per pickem contest (source pickems).
+    columns:
+      - name: contest_id
         tests:
-          - not_null
-      - name: game_type
-        tests:
-          - not_null
-          - accepted_values:
-              values: ['pickem']
-      - name: registration_type
-        tests:
-          - not_null
-          - accepted_values:
-              values: ['sso', 'form']
-      - name: registered_at
-        tests:
+          - unique
           - not_null
 
   - name: stg_gaming1__selections
-    description: Individual user picks within a contest. Source grain for this domain.
+    description: One row per pickem selection (source user_selections). Source grain for pickem.
     columns:
       - name: selection_id
         tests:
           - unique
           - not_null
-      - name: entry_id
-        tests:
-          - not_null
-      - name: user_id
-        tests:
-          - not_null
-      - name: contest_id
-        tests:
-          - not_null
-      - name: client_id
-        tests:
-          - not_null
-      - name: game_type
-        tests:
-          - not_null
-          - accepted_values:
-              values: ['pickem']
 
   - name: stg_gaming1__questions
-    description: Questions belonging to each pickem contest.
+    description: One row per question in a pickem contest.
     columns:
       - name: question_id
         tests:
           - unique
           - not_null
-      - name: contest_id
-        tests:
-          - not_null
 
   - name: stg_gaming1__options
-    description: Answer options for each question.
+    description: One row per answer option for a pickem question.
     columns:
       - name: option_id
         tests:
           - unique
           - not_null
-      - name: question_id
+
+  # squads
+
+  - name: stg_gaming1__squads_competitions
+    description: One row per squads competition (source squads_contests), e.g. Belgian Pro League.
+    columns:
+      - name: competition_id
         tests:
+          - unique
+          - not_null
+
+  - name: stg_gaming1__squads_contests
+    description: One row per squads round (source squads_rounds), the canonical contest.
+    columns:
+      - name: contest_id
+        tests:
+          - unique
+          - not_null
+
+  - name: stg_gaming1__squads_contest_days
+    description: One row per squads round day (source squads_round_days).
+    columns:
+      - name: contest_day_id
+        tests:
+          - unique
+          - not_null
+
+  - name: stg_gaming1__squads_players
+    description: One row per footballer per competition that can appear on a squads card.
+    columns:
+      - name: player_id
+        tests:
+          - unique
+          - not_null
+
+  - name: stg_gaming1__squads_entries
+    description: One row per user per squads round entered (source squads_user_rounds).
+    columns:
+      - name: entry_id
+        tests:
+          - unique
+          - not_null
+
+  - name: stg_gaming1__squads_entry_slots
+    description: One row per slot (round day) per squads entry (source squads_user_slots).
+    columns:
+      - name: slot_id
+        tests:
+          - unique
+          - not_null
+
+  - name: stg_gaming1__squads_slot_candidates
+    description: One row per card shown to a user for a squads slot (source squads_user_slot_candidates).
+    columns:
+      - name: candidate_id
+        tests:
+          - unique
           - not_null

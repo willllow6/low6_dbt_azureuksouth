@@ -53,9 +53,11 @@ final as (
         g.tenant_name,
         g.game_type,
         case
-            when g.is_prod then g.game_name
+            when g.is_prod then g.contest_name
             else 'Test'
         end                         as contest_name,
+        g.game_name,
+        g.game_theme,
         case
             when not g.is_prod or coalesce(w.entries, 0) = 0    then 'test'
             when w.has_entries_today                            then 'live'
