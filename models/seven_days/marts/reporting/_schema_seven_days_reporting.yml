@@ -169,5 +169,5 @@ exposures:
       - ref('rpt_seven_days__activity_heatmap_weekly')
       - ref('rpt_seven_days__game_crossplay_summary')
       - ref('dim_seven_days__users')
-      - ref('agg_seven_days__entries_daily')
-      - ref('mart_seven_days__entries')
+      - ref('fct_seven_days__entries')
+      - ref('dim_seven_days__contests')

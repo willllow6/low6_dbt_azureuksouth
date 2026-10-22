@@ -356,18 +356,20 @@ game_oddschecker_spintowin as (
 
 --------------------------------------------------------------------------------
 -- seven_days -- four products, each its own game_id; multi-tenant by site.
--- Test games (is_prod = false, surfaced as game_name = 'Test') are excluded.
+-- Test games (is_prod = false, surfaced as contest_name = 'Test') are excluded.
 --------------------------------------------------------------------------------
 
 sd_entries as (
 
     select
-        user_id,
-        game_name,
-        tenant_name,
-        date_trunc('week', cast(convert_timezone('UTC', 'America/New_York', created_at) as date)) as activity_week
-    from {{ ref('mart_seven_days__entries') }}
-    where game_name != 'Test'
+        e.user_id,
+        c.contest_name as game_name,
+        e.tenant_name,
+        date_trunc('week', cast(convert_timezone('UTC', 'America/New_York', e.entered_at) as date)) as activity_week
+    from {{ ref('fct_seven_days__entries') }} as e
+    inner join {{ ref('dim_seven_days__contests') }} as c
+        on e.contest_id = c.contest_id
+    where c.contest_name != 'Test'
 
 ),
 

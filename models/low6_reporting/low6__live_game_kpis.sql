@@ -63,30 +63,31 @@ pivot_bracket as (
     
 ),
 
-sevendays_pq as (
+-- One app_id per seven_days product; only the named contests are counted (test games and
+-- variants such as 'Coin Drop Football' are excluded). session_date is the UTC entry date.
+sevendays_entries as (
 
     select
-        '7dpq' as app_id,
-        count(*) as entries,
-        sum(case when session_date = current_date() - 1 then 1 else 0 end) as yesterday_entries,
-        sum(case when session_date >= current_date() - 8 and session_date < current_date() then 1 else 0 end) as last_7_days_entries,
-        sum(case when session_date >= current_date() - 29 and session_date < current_date() then 1 else 0 end) as last_28_days_entries,
-        count(distinct user_id) as entrants,
-        count(distinct case when session_date = current_date() - 1 then user_id else null end) as yesterday_entrants,
-        count(distinct case when session_date >= current_date() - 8 and session_date < current_date() then user_id else null end) as last_7_days_entrants,
-        count(distinct case when session_date >= current_date() - 29 and session_date < current_date() then user_id else null end) as last_28_days_entrants,
-        count(distinct game_id) as contests,
-        max(cast(session_date as date)) as last_entry_date
-    from {{ ref('mart_seven_days__entries') }}
-    where game_name = 'Pirate Quest'
-    group by 1
+        case c.contest_name
+            when 'Pirate Quest' then '7dpq'
+            when 'Coin Drop'    then '7dcd'
+            when 'Drop Zone'    then '7ddz'
+            when 'Alien Dash'   then '7dad'
+            when 'Pinball'      then '7dpb'
+        end as app_id,
+        e.user_id,
+        c.game_id,
+        cast(e.entered_at as date) as session_date
+    from {{ ref('fct_seven_days__entries') }} as e
+    inner join {{ ref('dim_seven_days__contests') }} as c
+        on e.contest_id = c.contest_id
 
 ),
 
-sevendays_cd as (
+sevendays as (
 
     select
-        '7dcd' as app_id,
+        app_id,
         count(*) as entries,
         sum(case when session_date = current_date() - 1 then 1 else 0 end) as yesterday_entries,
         sum(case when session_date >= current_date() - 8 and session_date < current_date() then 1 else 0 end) as last_7_days_entries,
@@ -96,49 +97,9 @@ sevendays_cd as (
         count(distinct case when session_date >= current_date() - 8 and session_date < current_date() then user_id else null end) as last_7_days_entrants,
         count(distinct case when session_date >= current_date() - 29 and session_date < current_date() then user_id else null end) as last_28_days_entrants,
         count(distinct game_id) as contests,
-        max(cast(session_date as date)) as last_entry_date
-    from {{ ref('mart_seven_days__entries') }}
-    where game_name = 'Coin Drop'
-    group by 1
-
-),
-
-sevendays_dz as (
-
-    select
-        '7ddz' as app_id,
-        count(*) as entries,
-        sum(case when session_date = current_date() - 1 then 1 else 0 end) as yesterday_entries,
-        sum(case when session_date >= current_date() - 8 and session_date < current_date() then 1 else 0 end) as last_7_days_entries,
-        sum(case when session_date >= current_date() - 29 and session_date < current_date() then 1 else 0 end) as last_28_days_entries,
-        count(distinct user_id) as entrants,
-        count(distinct case when session_date = current_date() - 1 then user_id else null end) as yesterday_entrants,
-        count(distinct case when session_date >= current_date() - 8 and session_date < current_date() then user_id else null end) as last_7_days_entrants,
-        count(distinct case when session_date >= current_date() - 29 and session_date < current_date() then user_id else null end) as last_28_days_entrants,
-        count(distinct game_id) as contests,
-        max(cast(session_date as date)) as last_entry_date
-    from {{ ref('mart_seven_days__entries') }}
-    where game_name = 'Drop Zone'
-    group by 1
-
-),
-
-sevendays_ad as (
-
-    select
-        '7dad' as app_id,
-        count(*) as entries,
-        sum(case when session_date = current_date() - 1 then 1 else 0 end) as yesterday_entries,
-        sum(case when session_date >= current_date() - 8 and session_date < current_date() then 1 else 0 end) as last_7_days_entries,
-        sum(case when session_date >= current_date() - 29 and session_date < current_date() then 1 else 0 end) as last_28_days_entries,
-        count(distinct user_id) as entrants,
-        count(distinct case when session_date = current_date() - 1 then user_id else null end) as yesterday_entrants,
-        count(distinct case when session_date >= current_date() - 8 and session_date < current_date() then user_id else null end) as last_7_days_entrants,
-        count(distinct case when session_date >= current_date() - 29 and session_date < current_date() then user_id else null end) as last_28_days_entrants,
-        count(distinct game_id) as contests,
-        max(cast(session_date as date)) as last_entry_date
-    from {{ ref('mart_seven_days__entries') }}
-    where game_name = 'Alien Dash'
+        max(session_date) as last_entry_date
+    from sevendays_entries
+    where app_id is not null
     group by 1
 
 ),
@@ -235,22 +196,7 @@ from pivot_bracket
 union all
 
 select *
-from sevendays_pq
-
-union all
-
-select *
-from sevendays_cd
-
-union all
-
-select *
-from sevendays_dz
-
-union all
-
-select *
-from sevendays_ad
+from sevendays
 
 union all
 

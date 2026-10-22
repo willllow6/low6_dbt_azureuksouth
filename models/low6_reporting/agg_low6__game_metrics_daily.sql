@@ -677,18 +677,29 @@ game_oddschecker_spintowin as (
 -- own game_id, multi-tenant by site. No registration source exists for this
 -- domain (raw sources are sessions + games only), so registrations is proxied
 -- by first_entries (a user's first entry into that game/tenant).
--- Test games (is_prod = false, surfaced as game_name = 'Test') are excluded.
+-- Test games (is_prod = false, surfaced as contest_name = 'Test') are excluded.
 --------------------------------------------------------------------------------
+
+sd_entries_with_contest as (
+
+    select
+        e.purchase_id,
+        e.user_id,
+        c.contest_name as game_name,
+        e.tenant_name,
+        e.entry_date_uk as date_day,
+        e.entry_fee
+    from {{ ref('fct_seven_days__entries') }} as e
+    inner join {{ ref('dim_seven_days__contests') }} as c
+        on e.contest_id = c.contest_id
+    where c.contest_name != 'Test'
+
+),
 
 sd_entries_raw as (
 
-    select
-        user_id,
-        game_name,
-        tenant_name,
-        cast(convert_timezone('UTC', '{{ var("local_timezone") }}', created_at) as date) as date_day
-    from {{ ref('mart_seven_days__entries') }}
-    where game_name != 'Test'
+    select user_id, game_name, tenant_name, date_day
+    from sd_entries_with_contest
 
 ),
 
@@ -773,14 +784,13 @@ sd_first_entries as (
 sd_purchases_raw as (
 
     select
-        session_id,
+        purchase_id,
         user_id,
         game_name,
         tenant_name,
-        cast(convert_timezone('UTC', '{{ var("local_timezone") }}', created_at) as date) as date_day,
-        sum(ticket_price) as revenue
-    from {{ ref('mart_seven_days__entries') }}
-    where game_name != 'Test'
+        date_day,
+        sum(entry_fee) as revenue
+    from sd_entries_with_contest
     group by 1, 2, 3, 4, 5
 
 ),

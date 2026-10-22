@@ -21,56 +21,38 @@ prizekings as (
 
 ),
 
-sevendays_pq as (
+-- One app_id per seven_days product; only the named contests are counted (test games and
+-- variants such as 'Coin Drop Football' are excluded). session_date is the UTC entry date.
+sevendays_entries as (
 
     select
-        '7dpq' as app_id,
-        sum(ticket_price) as gross_revenue,
-        sum(case when session_date = current_date() - 1 then ticket_price else null end) as yesterday_gross_revenue,
-        sum(case when session_date >= current_date() - 8 and session_date < current_date() then ticket_price else null end) as last_7_days_gross_revenue,
-        sum(case when session_date >= current_date() - 29 and session_date < current_date() then ticket_price else null end) as last_28_days_gross_revenue
-    from {{ ref('mart_seven_days__entries') }}
-    where game_name = 'Pirate Quest'
+        case c.contest_name
+            when 'Pirate Quest' then '7dpq'
+            when 'Coin Drop'    then '7dcd'
+            when 'Drop Zone'    then '7ddz'
+            when 'Alien Dash'   then '7dad'
+            when 'Pinball'      then '7dpb'
+        end as app_id,
+        e.entry_fee as ticket_price,
+        cast(e.entered_at as date) as session_date
+    from {{ ref('fct_seven_days__entries') }} as e
+    inner join {{ ref('dim_seven_days__contests') }} as c
+        on e.contest_id = c.contest_id
 
 ),
 
-sevendays_cd as (
+sevendays as (
 
     select
-        '7dcd' as app_id,
+        app_id,
         sum(ticket_price) as gross_revenue,
         sum(case when session_date = current_date() - 1 then ticket_price else null end) as yesterday_gross_revenue,
         sum(case when session_date >= current_date() - 8 and session_date < current_date() then ticket_price else null end) as last_7_days_gross_revenue,
         sum(case when session_date >= current_date() - 29 and session_date < current_date() then ticket_price else null end) as last_28_days_gross_revenue
-    from {{ ref('mart_seven_days__entries') }}
-    where game_name = 'Coin Drop'
-    
-),
+    from sevendays_entries
+    where app_id is not null
+    group by 1
 
-sevendays_dz as (
-
-    select
-        '7ddz' as app_id,
-        sum(ticket_price) as gross_revenue,
-        sum(case when session_date = current_date() - 1 then ticket_price else null end) as yesterday_gross_revenue,
-        sum(case when session_date >= current_date() - 8 and session_date < current_date() then ticket_price else null end) as last_7_days_gross_revenue,
-        sum(case when session_date >= current_date() - 29 and session_date < current_date() then ticket_price else null end) as last_28_days_gross_revenue
-    from {{ ref('mart_seven_days__entries') }}
-    where game_name = 'Drop Zone'
-    
-),
-
-sevendays_ad as (
-
-    select
-        '7dad' as app_id,
-        sum(ticket_price) as gross_revenue,
-        sum(case when session_date = current_date() - 1 then ticket_price else null end) as yesterday_gross_revenue,
-        sum(case when session_date >= current_date() - 8 and session_date < current_date() then ticket_price else null end) as last_7_days_gross_revenue,
-        sum(case when session_date >= current_date() - 29 and session_date < current_date() then ticket_price else null end) as last_28_days_gross_revenue
-    from {{ ref('mart_seven_days__entries') }}
-    where game_name = 'Alien Dash'
-    
 ),
 
 unioned as (
@@ -80,22 +62,7 @@ unioned as (
     union all
 
     select *
-    from sevendays_pq
-
-    union all
-
-    select *
-    from sevendays_cd
-
-    union all
-
-    select *
-    from sevendays_dz
-
-    union all
-
-    select *
-    from sevendays_ad
+    from sevendays
 
 )
 
