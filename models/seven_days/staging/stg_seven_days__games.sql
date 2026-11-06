@@ -40,7 +40,7 @@ renamed as (
         trim(
             regexp_replace(
                 name,
-                '\\s*-\\s*|\\s*(christmas|football)\\s*',
+                '\\s*-\\s*|\\s*(christmas|football|halloween|high\\s*roller)\\s*|\\bhr$',
                 ' ',
                 1,
                 0,
@@ -50,6 +50,8 @@ renamed as (
         case
             when name ilike '%football%'    then 'Football'
             when name ilike '%christmas%'   then 'Christmas'
+            when name ilike '%halloween%'   then 'Halloween'
+            when name ilike '%high%roller%' or name ilike '% hr' then 'High Roller'
         end                     as game_theme,
         'GBP'                   as currency,
 

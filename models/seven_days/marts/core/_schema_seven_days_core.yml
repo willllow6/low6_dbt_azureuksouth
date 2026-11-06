@@ -9,7 +9,8 @@ models:
       last observed sale, null while the instance is still selling (no on-sale dates exist in
       the source). contest_status: 'test' (no ticket price or no entries), 'live' (entries
       today, UK time), else 'closed'. game_name is the base game with the theme removed;
-      game_theme is 'Football' / 'Christmas', null for unthemed games. Evaluated at query
+      game_theme is 'Football' / 'Christmas' / 'Halloween' / 'High Roller', null for unthemed
+      games. Evaluated at query
       time (view).
     columns:
       - name: contest_id

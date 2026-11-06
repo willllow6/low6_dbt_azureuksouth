@@ -1,0 +1,10 @@
+version: 2
+
+models:
+
+  - name: sv_seven_days__core
+    description: >
+      Snowflake semantic view over the seven_days core facts and dimensions (entries,
+      purchases, user activity, contests, users, prizes) for Cortex Analyst / Snowflake
+      Intelligence agents. Descriptions and business context are inline in the model SQL:
+      persist_docs doesn't reach semantic views.

@@ -94,6 +94,16 @@ models:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns: [tenant_id, activity_week]
 
+  - name: rpt_seven_days__growth_bridge_weekly
+    description: >
+      One row per site (tenant) per UK week per measure (revenue / players) per bridge
+      component. Waterfall from last week (opening) through new, reactivated, expansion,
+      contraction (revenue only) and churned to this week (closing). amount is signed;
+      waterfall_start / waterfall_end are precomputed bar ends for a Tableau Gantt waterfall.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: [tenant_id, activity_week, measure, component]
+
   - name: rpt_seven_days__post_outcome_behaviour_daily
     description: >
       One row per site (tenant) per UK day per game per price tier per purchase outcome
@@ -162,6 +172,7 @@ exposures:
       - ref('rpt_seven_days__site_health_daily')
       - ref('rpt_seven_days__cohort_retention_weekly')
       - ref('rpt_seven_days__player_growth_accounting_weekly')
+      - ref('rpt_seven_days__growth_bridge_weekly')
       - ref('rpt_seven_days__post_outcome_behaviour_daily')
       - ref('rpt_seven_days__price_point_summary_monthly')
       - ref('rpt_seven_days__price_tier_migration_monthly')

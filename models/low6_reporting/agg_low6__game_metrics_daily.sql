@@ -678,6 +678,7 @@ game_oddschecker_spintowin as (
 -- domain (raw sources are sessions + games only), so registrations is proxied
 -- by first_entries (a user's first entry into that game/tenant).
 -- Test games (is_prod = false, surfaced as contest_name = 'Test') are excluded.
+-- game_name has the theme removed, so themed variants roll up into the base game.
 --------------------------------------------------------------------------------
 
 sd_entries_with_contest as (
@@ -685,7 +686,7 @@ sd_entries_with_contest as (
     select
         e.purchase_id,
         e.user_id,
-        c.contest_name as game_name,
+        c.game_name,
         e.tenant_name,
         e.entry_date_uk as date_day,
         e.entry_fee
